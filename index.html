@@ -9,10 +9,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
+    <!-- LZ-String for data decompression -->
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 
     <style>
         body {
@@ -174,10 +172,8 @@
         .envelope::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 0;
+            top: 0; left: 0;
+            width: 0; height: 0;
             border-left: 140px solid transparent;
             border-right: 140px solid transparent;
             border-top: 120px solid #ec4899;
@@ -195,10 +191,8 @@
         .envelope::after {
             content: '';
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 0;
+            bottom: 0; left: 0;
+            width: 0; height: 0;
             border-left: 140px solid #f9a8d4;
             border-right: 140px solid #f9a8d4;
             border-bottom: 120px solid #f472b6;
@@ -210,9 +204,7 @@
 
         .letter {
             position: absolute;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
+            bottom: 10px; left: 10px; right: 10px;
             height: 170px;
             background-color: white;
             border-radius: 4px;
@@ -278,6 +270,7 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
+            transition: opacity 0.5s;
         }
 
         .page-loader .loader-heart {
@@ -356,7 +349,7 @@
         <div class="loader-text">กำลังโหลด Surprise...</div>
     </div>
 
-    <!-- Landing Page (no project ID) -->
+    <!-- Landing Page (no data) -->
     <div id="landing-page" class="landing-container" style="display:none;">
         <div style="font-size:5rem; margin-bottom:1rem;">🎁</div>
         <h1>Surprise Creator</h1>
@@ -368,28 +361,21 @@
     <div id="error-page" class="error-container" style="display:none;">
         <div style="font-size:5rem; margin-bottom:1rem;">😢</div>
         <h1 style="font-size:2rem; color:#ec4899; margin-bottom:0.5rem;">ไม่พบ Surprise นี้</h1>
-        <p style="color:#9ca3af;">ลิงค์อาจไม่ถูกต้องหรือถูกลบไปแล้ว</p>
+        <p style="color:#9ca3af;">ลิงค์อาจไม่ถูกต้องหรือเสียหาย</p>
     </div>
 
     <!-- Dynamic Content Container -->
     <div id="app-container" style="display:none; width:100%;">
-        <!-- Section: Level Menu (dynamically populated) -->
+        <!-- Level Menu -->
         <section id="section-menu" class="w-full max-w-4xl mx-auto p-6 flex flex-col items-center justify-center min-h-screen fade-in">
             <h1 class="text-4xl md:text-5xl font-bold text-pink-500 mb-8 drop-shadow-sm text-center" id="menu-title">Our Journey 💖</h1>
             <p class="text-gray-500 mb-10 text-lg">เลือกด่านความทรงจำของเราเลยยย 🥰</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-4" id="level-grid">
-                <!-- Dynamically populated -->
-            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-4" id="level-grid"></div>
         </section>
 
-        <!-- Dynamic Level Sections Container -->
-        <div id="levels-container">
-            <!-- Levels are built dynamically by JS -->
-        </div>
+        <!-- Dynamic Level Sections -->
+        <div id="levels-container"></div>
     </div>
-
-    <!-- Firebase Config -->
-    <script src="js/firebase-config.js"></script>
 
     <script>
         // =============================================
@@ -409,26 +395,24 @@
         // =============================================
         //  INITIALIZATION
         // =============================================
-        async function init() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const projectId = urlParams.get('id');
+        function init() {
+            const hash = window.location.hash.substring(1); // remove '#'
 
-            if (!projectId) {
+            if (!hash) {
                 hideLoader();
                 document.getElementById('landing-page').style.display = 'flex';
                 return;
             }
 
             try {
-                const doc = await db.collection('projects').doc(projectId).get();
+                // Decompress from URL hash
+                const jsonStr = LZString.decompressFromEncodedURIComponent(hash);
 
-                if (!doc.exists) {
-                    hideLoader();
-                    document.getElementById('error-page').style.display = 'flex';
-                    return;
+                if (!jsonStr) {
+                    throw new Error('Decompress failed');
                 }
 
-                projectData = doc.data();
+                projectData = JSON.parse(jsonStr);
                 document.title = (projectData.name || 'Surprise') + ' 💖';
 
                 buildLevelMenu();
@@ -447,7 +431,6 @@
         function hideLoader() {
             const loader = document.getElementById('page-loader');
             loader.style.opacity = '0';
-            loader.style.transition = 'opacity 0.5s';
             setTimeout(() => loader.style.display = 'none', 500);
         }
 
@@ -535,7 +518,7 @@
                     <div class="memory-row flex items-center justify-between w-full mb-12 relative story-hidden">
                         <div class="absolute left-1/2 transform -translate-x-1/2 w-5 h-5 bg-white border-4 border-pink-400 rounded-full z-10 shadow-sm"></div>
                         <div class="w-[45%] pr-4 md:pr-8 text-right">
-                            ${mem.imageUrl ? `<img src="${mem.imageUrl}" class="rounded-xl shadow-md inline-block w-full max-w-[200px] border-2 border-white transform ${rotation}" loading="lazy">` : ''}
+                            ${mem.imageUrl ? `<img src="${mem.imageUrl}" class="rounded-xl shadow-md inline-block w-full max-w-[200px] border-2 border-white transform ${rotation}">` : ''}
                         </div>
                         <div class="w-[45%] pl-4 md:pl-8 text-left">
                             <span class="block text-pink-500 font-bold text-lg mb-1">${escapeHtml(mem.date)}</span>
@@ -553,7 +536,7 @@
                             <p class="text-gray-600 text-sm md:text-base">${escapeHtml(mem.desc)}</p>
                         </div>
                         <div class="w-[45%] pl-4 md:pl-8 text-left">
-                            ${mem.imageUrl ? `<img src="${mem.imageUrl}" class="rounded-xl shadow-md inline-block w-full max-w-[200px] border-2 border-white transform ${rotation}" loading="lazy">` : ''}
+                            ${mem.imageUrl ? `<img src="${mem.imageUrl}" class="rounded-xl shadow-md inline-block w-full max-w-[200px] border-2 border-white transform ${rotation}">` : ''}
                         </div>
                     </div>`;
                 }
@@ -613,29 +596,23 @@
             const images = data.images || [];
             const message = data.message || '';
 
-            // Split images into two reels
             const half = Math.ceil(images.length / 2);
-            const reel1Images = images.slice(0, half);
-            const reel2Images = images.slice(half);
+            const reel1Images = images.slice(0, Math.max(half, 1));
+            const reel2Images = images.slice(half).length > 0 ? images.slice(half) : reel1Images;
 
-            // If less images, use placeholders
             const buildReel = (imgs) => {
-                if (imgs.length === 0) {
-                    imgs = ['https://placehold.co/400x300/cbd5e1/475569?text=Memory'];
-                }
-                const cards = imgs.map((url, i) => {
+                if (imgs.length === 0) imgs = ['https://placehold.co/400x300/cbd5e1/475569?text=Memory'];
+                return imgs.map((url, i) => {
                     const rot = [1, -1, 2, -2, 1][i % 5];
                     return `<div class="w-64 h-40 md:w-80 md:h-52 bg-white p-2 md:p-3 pb-6 md:pb-8 rounded shadow-2xl flex-shrink-0" style="transform:rotate(${rot}deg)">
-                        <img src="${url}" class="w-full h-full object-cover rounded-sm" loading="lazy">
+                        <img src="${url}" class="w-full h-full object-cover rounded-sm">
                     </div>`;
                 }).join('');
-                return cards;
             };
 
             const reel1HTML = buildReel(reel1Images);
-            const reel2HTML = buildReel(reel2Images.length > 0 ? reel2Images : reel1Images);
+            const reel2HTML = buildReel(reel2Images);
 
-            // Build message paragraphs
             const messageParagraphs = message.split('\n').filter(p => p.trim()).map(p => `<p>${escapeHtml(p)}</p>`).join('');
 
             const section = document.createElement('section');
@@ -645,7 +622,6 @@
             section.innerHTML = `
                 <button onclick="goToMenu('section-universe')" class="absolute top-4 left-4 bg-black/30 backdrop-blur px-4 py-2 rounded-full text-pink-300 font-semibold shadow z-50 hover:bg-black/50 transition border border-purple-500">&larr; กลับหน้าหลัก</button>
                 <div class="h-screen flex flex-col justify-between py-10 relative">
-                    <!-- Stars/Hearts Background -->
                     <div class="absolute inset-0 pointer-events-none overflow-hidden">
                         <div class="absolute top-[10%] left-[10%] text-pink-400 opacity-60 animate-pulse text-2xl">❤️</div>
                         <div class="absolute top-[20%] right-[15%] text-pink-300 opacity-50 animate-pulse text-4xl" style="animation-delay: 1s;">💖</div>
@@ -659,12 +635,10 @@
                     <h2 class="text-3xl md:text-5xl font-bold text-pink-300 z-10 text-center drop-shadow-[0_0_15px_rgba(244,114,182,0.8)] px-4">Our Cinematic Memories 🎞️</h2>
 
                     <div class="relative w-full z-10 flex flex-col gap-6 md:gap-10 my-auto py-8">
-                        <!-- Reel 1 -->
                         <div class="flex whitespace-nowrap animate-scroll-left">
                             <div class="flex gap-4 px-2">${reel1HTML}</div>
                             <div class="flex gap-4 px-2">${reel1HTML}</div>
                         </div>
-                        <!-- Reel 2 -->
                         <div class="flex whitespace-nowrap animate-scroll-right">
                             <div class="flex gap-4 px-2">${reel2HTML}</div>
                             <div class="flex gap-4 px-2">${reel2HTML}</div>
@@ -739,10 +713,9 @@
         }
 
         // =============================================
-        //  NAVIGATION LOGIC
+        //  NAVIGATION
         // =============================================
         function startLevel(levelId) {
-            // Reset level state before showing
             if (levelId === 'section-timeline') {
                 currentMemoryIndex = 0;
                 document.querySelectorAll('.memory-row').forEach(el => {
@@ -750,52 +723,39 @@
                     el.classList.add('story-hidden');
                 });
                 const nextBtn = document.getElementById('timeline-next-btn');
-                if (nextBtn) {
-                    nextBtn.classList.add('opacity-0', 'pointer-events-none');
-                    nextBtn.classList.remove('opacity-100');
-                }
-                const timelineSection = document.getElementById('section-timeline');
-                if (timelineSection) timelineSection.style.cursor = 'pointer';
+                if (nextBtn) { nextBtn.classList.add('opacity-0', 'pointer-events-none'); nextBtn.classList.remove('opacity-100'); }
+                const ts = document.getElementById('section-timeline');
+                if (ts) ts.style.cursor = 'pointer';
             } else if (levelId === 'section-password') {
                 wrongAttempts = 0;
-                const errorMsg = document.getElementById('error-msg');
-                if (errorMsg) {
-                    errorMsg.classList.add('hidden');
-                    errorMsg.classList.remove('text-green-500');
-                    errorMsg.classList.add('text-red-500');
-                    errorMsg.innerText = "รหัสผิดน้าา ลองใหม่ๆ 🥺";
-                }
-                const hintEl = document.getElementById('auto-hint');
-                if (hintEl) hintEl.classList.add('hidden');
+                const em = document.getElementById('error-msg');
+                if (em) { em.classList.add('hidden'); em.classList.remove('text-green-500'); em.classList.add('text-red-500'); em.innerText = "รหัสผิดน้าา ลองใหม่ๆ 🥺"; }
+                const ah = document.getElementById('auto-hint');
+                if (ah) ah.classList.add('hidden');
                 document.querySelectorAll('.pass-input').forEach(el => el.value = '');
             } else if (levelId === 'section-loading') {
                 chargeAmount = 0;
                 hasCharged = false;
-                if (typeof chargeInterval !== 'undefined' && chargeInterval) { clearInterval(chargeInterval); chargeInterval = null; }
-                if (typeof drainInterval !== 'undefined' && drainInterval) { clearInterval(drainInterval); drainInterval = null; }
-                const filledHeart = document.getElementById('filled-heart');
-                if (filledHeart) filledHeart.style.clipPath = `inset(100% 0 0 0)`;
-                const chargeText = document.getElementById('charge-text');
-                if (chargeText) chargeText.innerText = "กดค้างเพื่อชาร์จพลังรัก 💖";
+                if (chargeInterval) { clearInterval(chargeInterval); chargeInterval = null; }
+                if (drainInterval) { clearInterval(drainInterval); drainInterval = null; }
+                const fh = document.getElementById('filled-heart');
+                if (fh) fh.style.clipPath = 'inset(100% 0 0 0)';
+                const ct = document.getElementById('charge-text');
+                if (ct) ct.innerText = "กดค้างเพื่อชาร์จพลังรัก 💖";
             } else if (levelId === 'section-letter') {
-                const envelope = document.getElementById('love-envelope');
-                if (envelope) envelope.classList.remove('open');
+                const env = document.getElementById('love-envelope');
+                if (env) env.classList.remove('open');
             } else if (levelId === 'section-question') {
-                const btnNo = document.getElementById('btn-no');
-                if (btnNo) {
-                    btnNo.style.position = 'static';
-                    btnNo.style.transform = 'none';
-                }
-                const successEl = document.getElementById('question-success');
-                if (successEl) successEl.classList.add('hidden');
+                const bn = document.getElementById('btn-no');
+                if (bn) { bn.style.position = 'static'; bn.style.transform = 'none'; }
+                const qs = document.getElementById('question-success');
+                if (qs) qs.classList.add('hidden');
             }
 
             nextSection('section-menu', levelId);
         }
 
-        function goToMenu(currentId) {
-            nextSection(currentId, 'section-menu');
-        }
+        function goToMenu(currentId) { nextSection(currentId, 'section-menu'); }
 
         function nextSection(currentId, nextId) {
             const current = document.getElementById(currentId);
@@ -803,11 +763,9 @@
             if (!current || !next) return;
 
             current.classList.add('fade-out');
-
             setTimeout(() => {
                 current.classList.add('section-hidden');
                 current.classList.remove('fade-out');
-
                 next.classList.remove('section-hidden');
                 next.classList.add('fade-in');
 
@@ -815,51 +773,32 @@
                     const p1 = document.getElementById('p1');
                     if (p1) p1.focus();
                 }
-
-                if (nextId === 'section-universe') {
-                    shootConfetti();
-                }
+                if (nextId === 'section-universe') shootConfetti();
             }, 500);
         }
 
         // =============================================
-        //  HOLD TO CHARGE LOGIC
+        //  CHARGE LOGIC
         // =============================================
-        let chargeInterval = null;
-        let drainInterval = null;
-        let chargeAmount = 0;
-        let hasCharged = false;
+        let chargeInterval = null, drainInterval = null, chargeAmount = 0, hasCharged = false;
 
         function startCharge(e) {
             e.preventDefault();
             if (hasCharged) return;
-
-            if (drainInterval) {
-                clearInterval(drainInterval);
-                drainInterval = null;
-            }
+            if (drainInterval) { clearInterval(drainInterval); drainInterval = null; }
 
             document.getElementById('charge-text').innerText = "ชาร์จพลังรัก... 💖";
-
             chargeInterval = setInterval(() => {
                 chargeAmount += 1.5;
                 if (chargeAmount >= 100) chargeAmount = 100;
-
                 document.getElementById('filled-heart').style.clipPath = `inset(${100 - chargeAmount}% 0 0 0)`;
 
                 if (chargeAmount >= 100) {
-                    clearInterval(chargeInterval);
-                    chargeInterval = null;
-                    hasCharged = true;
-
-                    // Use custom complete message
-                    const loadingSection = document.getElementById('section-loading');
-                    const completeMsg = loadingSection?.dataset?.completeMessage || 'หัวใจเต็มเปี่ยม! 💖💖💖';
-                    document.getElementById('charge-text').innerText = completeMsg;
-
-                    setTimeout(() => {
-                        goToMenu('section-loading');
-                    }, 1500);
+                    clearInterval(chargeInterval); chargeInterval = null; hasCharged = true;
+                    const ls = document.getElementById('section-loading');
+                    const msg = ls?.dataset?.completeMessage || 'หัวใจเต็มเปี่ยม! 💖💖💖';
+                    document.getElementById('charge-text').innerText = msg;
+                    setTimeout(() => goToMenu('section-loading'), 1500);
                 }
             }, 20);
         }
@@ -867,18 +806,13 @@
         function stopCharge(e) {
             e.preventDefault();
             if (hasCharged) return;
-
-            if (chargeInterval) {
-                clearInterval(chargeInterval);
-                chargeInterval = null;
-            }
+            if (chargeInterval) { clearInterval(chargeInterval); chargeInterval = null; }
 
             drainInterval = setInterval(() => {
                 chargeAmount -= 3;
                 if (chargeAmount <= 0) {
                     chargeAmount = 0;
-                    clearInterval(drainInterval);
-                    drainInterval = null;
+                    clearInterval(drainInterval); drainInterval = null;
                     document.getElementById('charge-text').innerText = "กดค้างเพื่อชาร์จพลังรัก 💖";
                 }
                 document.getElementById('filled-heart').style.clipPath = `inset(${100 - chargeAmount}% 0 0 0)`;
@@ -891,60 +825,48 @@
         let wrongAttempts = 0;
 
         function moveToNext(currentInput, event) {
-            const errorMsg = document.getElementById('error-msg');
-            if (errorMsg) errorMsg.classList.add('hidden');
+            const em = document.getElementById('error-msg');
+            if (em) em.classList.add('hidden');
 
             if (currentInput.value.length >= 1) {
-                let nextInput = currentInput.nextElementSibling;
-                if (nextInput && nextInput.tagName.toLowerCase() === "input") {
-                    nextInput.focus();
-                }
+                let next = currentInput.nextElementSibling;
+                if (next && next.tagName.toLowerCase() === 'input') next.focus();
             }
-
-            if (event.key === "Backspace") {
-                let prevInput = currentInput.previousElementSibling;
-                if (prevInput && prevInput.tagName.toLowerCase() === "input") {
-                    prevInput.focus();
-                }
+            if (event.key === 'Backspace') {
+                let prev = currentInput.previousElementSibling;
+                if (prev && prev.tagName.toLowerCase() === 'input') prev.focus();
             }
         }
 
         function checkPassword() {
-            let enteredPass = "";
+            let entered = '';
             for (let i = 1; i <= 6; i++) {
                 const el = document.getElementById('p' + i);
-                if (el) enteredPass += el.value;
+                if (el) entered += el.value;
             }
 
-            if (enteredPass.length === 6) {
-                const correctPassword = projectData?.levelData?.password?.code || '000000';
-
-                if (enteredPass === correctPassword) {
-                    document.getElementById('error-msg').classList.remove('hidden');
-                    document.getElementById('error-msg').classList.remove('text-red-500');
-                    document.getElementById('error-msg').classList.add('text-green-500');
-                    document.getElementById('error-msg').innerText = "รหัสถูกต้อง! เก่งมากกก 🎉";
-
-                    setTimeout(() => {
-                        goToMenu('section-password');
-                    }, 1500);
+            if (entered.length === 6) {
+                const correct = projectData?.levelData?.password?.code || '000000';
+                if (entered === correct) {
+                    const em = document.getElementById('error-msg');
+                    em.classList.remove('hidden', 'text-red-500');
+                    em.classList.add('text-green-500');
+                    em.innerText = "รหัสถูกต้อง! เก่งมากกก 🎉";
+                    setTimeout(() => goToMenu('section-password'), 1500);
                 } else {
                     wrongAttempts++;
                     document.getElementById('error-msg').classList.remove('hidden');
-
                     if (wrongAttempts >= 2) {
-                        const hintEl = document.getElementById('auto-hint');
-                        if (hintEl) hintEl.classList.remove('hidden');
+                        const ah = document.getElementById('auto-hint');
+                        if (ah) ah.classList.remove('hidden');
                     }
-
-                    const inputs = document.querySelectorAll('.pass-input');
-                    inputs.forEach(input => {
-                        input.style.transform = "translateX(-5px)";
-                        setTimeout(() => input.style.transform = "translateX(5px)", 50);
-                        setTimeout(() => input.style.transform = "translateX(-5px)", 100);
-                        setTimeout(() => input.style.transform = "translateX(5px)", 150);
-                        setTimeout(() => input.style.transform = "translateX(0)", 200);
-                        input.value = "";
+                    document.querySelectorAll('.pass-input').forEach(input => {
+                        input.style.transform = 'translateX(-5px)';
+                        setTimeout(() => input.style.transform = 'translateX(5px)', 50);
+                        setTimeout(() => input.style.transform = 'translateX(-5px)', 100);
+                        setTimeout(() => input.style.transform = 'translateX(5px)', 150);
+                        setTimeout(() => input.style.transform = 'translateX(0)', 200);
+                        input.value = '';
                     });
                     document.getElementById('p1').focus();
                 }
@@ -961,74 +883,57 @@
             if (currentMemoryIndex < memories.length) {
                 memories[currentMemoryIndex].classList.remove('story-hidden');
                 memories[currentMemoryIndex].classList.add('story-visible');
-
                 if (currentMemoryIndex > 0) {
-                    setTimeout(() => {
-                        memories[currentMemoryIndex - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 100);
+                    setTimeout(() => memories[currentMemoryIndex - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
                 }
-
                 currentMemoryIndex++;
             }
-
             if (currentMemoryIndex === memories.length) {
-                const nextBtn = document.getElementById('timeline-next-btn');
-                if (nextBtn) {
-                    nextBtn.classList.remove('opacity-0', 'pointer-events-none');
-                    nextBtn.classList.add('opacity-100');
-                }
-                const timelineSection = document.getElementById('section-timeline');
-                if (timelineSection) timelineSection.style.cursor = 'default';
+                const nb = document.getElementById('timeline-next-btn');
+                if (nb) { nb.classList.remove('opacity-0', 'pointer-events-none'); nb.classList.add('opacity-100'); }
+                const ts = document.getElementById('section-timeline');
+                if (ts) ts.style.cursor = 'default';
             }
         }
 
         // =============================================
-        //  CONFETTI LOGIC
+        //  CONFETTI
         // =============================================
         function shootConfetti() {
             const colors = ['#f472b6', '#fb7185', '#e879f9', '#38bdf8', '#facc15'];
             for (let i = 0; i < 50; i++) {
-                createConfetti(colors);
+                const c = document.createElement('div');
+                c.classList.add('confetti');
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 4000);
             }
         }
 
-        function createConfetti(colors) {
-            const confetti = document.createElement('div');
-            confetti.classList.add('confetti');
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-            document.body.appendChild(confetti);
-            setTimeout(() => confetti.remove(), 4000);
-        }
-
         // =============================================
-        //  LETTER LOGIC
+        //  LETTER & QUESTION LOGIC
         // =============================================
         function toggleLetter() {
-            const envelope = document.getElementById('love-envelope');
-            if (envelope) envelope.classList.toggle('open');
+            const env = document.getElementById('love-envelope');
+            if (env) env.classList.toggle('open');
         }
 
-        // =============================================
-        //  QUESTION LOGIC
-        // =============================================
         function moveNoBtn() {
             const btn = document.getElementById('btn-no');
             if (!btn) return;
             btn.style.position = 'fixed';
-            const randomX = Math.floor(Math.random() * 60) + 20;
-            const randomY = Math.floor(Math.random() * 60) + 20;
-            btn.style.left = randomX + 'vw';
-            btn.style.top = randomY + 'vh';
+            btn.style.left = (Math.floor(Math.random() * 60) + 20) + 'vw';
+            btn.style.top = (Math.floor(Math.random() * 60) + 20) + 'vh';
         }
 
         function answerYes() {
-            const successEl = document.getElementById('question-success');
-            if (successEl) successEl.classList.remove('hidden');
+            const s = document.getElementById('question-success');
+            if (s) s.classList.remove('hidden');
             shootConfetti();
             setTimeout(() => {
-                if (successEl) successEl.classList.add('hidden');
+                if (s) s.classList.add('hidden');
                 goToMenu('section-question');
             }, 3000);
         }

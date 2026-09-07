@@ -9,10 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
+    <!-- LZ-String for data compression -->
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 
     <style>
         * {
@@ -73,11 +71,6 @@
             -webkit-text-fill-color: white;
         }
 
-        .header-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-
         /* ===== Buttons ===== */
         .btn {
             padding: 0.65rem 1.5rem;
@@ -104,9 +97,7 @@
             box-shadow: 0 8px 25px rgba(244, 114, 182, 0.4);
         }
 
-        .btn-primary:active {
-            transform: translateY(0);
-        }
+        .btn-primary:active { transform: translateY(0); }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.06);
@@ -136,9 +127,7 @@
             border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        .btn-danger:hover {
-            background: rgba(239, 68, 68, 0.25);
-        }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.25); }
 
         .btn:disabled {
             opacity: 0.5;
@@ -212,18 +201,14 @@
             box-shadow: 0 0 20px rgba(244, 114, 182, 0.4);
         }
 
-        .progress-step.active .step-label {
-            color: #f1f5f9;
-        }
+        .progress-step.active .step-label { color: #f1f5f9; }
 
         .progress-step.completed .step-number {
             background: #22c55e;
             color: white;
         }
 
-        .progress-step.completed .step-label {
-            color: #86efac;
-        }
+        .progress-step.completed .step-label { color: #86efac; }
 
         .progress-line {
             width: 60px;
@@ -243,19 +228,11 @@
             animation: fadeSlideIn 0.5s ease forwards;
         }
 
-        .step-content.active {
-            display: block;
-        }
+        .step-content.active { display: block; }
 
         @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ===== Section Title ===== */
@@ -297,10 +274,7 @@
         .level-select-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(135deg, rgba(244,114,182,0.08), rgba(168,85,247,0.08));
             opacity: 0;
             transition: opacity 0.3s;
@@ -312,9 +286,7 @@
             transform: translateY(-4px);
         }
 
-        .level-select-card:hover::before {
-            opacity: 1;
-        }
+        .level-select-card:hover::before { opacity: 1; }
 
         .level-select-card.selected {
             border-color: #f472b6;
@@ -324,10 +296,8 @@
         .level-select-card.selected::after {
             content: '✓';
             position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 28px;
-            height: 28px;
+            top: 12px; right: 12px;
+            width: 28px; height: 28px;
             background: linear-gradient(135deg, #f472b6, #a855f7);
             border-radius: 50%;
             display: flex;
@@ -362,9 +332,7 @@
         }
 
         /* ===== Form Inputs ===== */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+        .form-group { margin-bottom: 1.5rem; }
 
         .form-label {
             display: block;
@@ -397,9 +365,7 @@
         }
 
         .form-input::placeholder,
-        .form-textarea::placeholder {
-            color: #475569;
-        }
+        .form-textarea::placeholder { color: #475569; }
 
         .form-textarea {
             min-height: 120px;
@@ -416,9 +382,7 @@
             scrollbar-width: none;
         }
 
-        .level-tabs::-webkit-scrollbar {
-            display: none;
-        }
+        .level-tabs::-webkit-scrollbar { display: none; }
 
         .level-tab {
             padding: 0.6rem 1.25rem;
@@ -445,20 +409,12 @@
             box-shadow: 0 4px 15px rgba(244, 114, 182, 0.3);
         }
 
-        .level-tab .tab-check {
-            display: inline-block;
-            margin-left: 0.35rem;
-            color: #86efac;
-        }
-
         .level-config {
             display: none;
             animation: fadeSlideIn 0.4s ease forwards;
         }
 
-        .level-config.active {
-            display: block;
-        }
+        .level-config.active { display: block; }
 
         /* ===== Drop Zone ===== */
         .drop-zone {
@@ -526,10 +482,8 @@
 
         .image-preview-item .remove-btn {
             position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 24px;
-            height: 24px;
+            top: 6px; right: 6px;
+            width: 24px; height: 24px;
             background: rgba(239, 68, 68, 0.9);
             border: none;
             border-radius: 50%;
@@ -543,9 +497,7 @@
             transition: opacity 0.2s;
         }
 
-        .image-preview-item:hover .remove-btn {
-            opacity: 1;
-        }
+        .image-preview-item:hover .remove-btn { opacity: 1; }
 
         /* ===== Memory Items (Timeline Config) ===== */
         .memory-config-item {
@@ -558,9 +510,7 @@
             transition: all 0.3s;
         }
 
-        .memory-config-item:hover {
-            border-color: rgba(255, 255, 255, 0.12);
-        }
+        .memory-config-item:hover { border-color: rgba(255, 255, 255, 0.12); }
 
         .memory-header {
             display: flex;
@@ -581,17 +531,11 @@
             gap: 0.75rem;
         }
 
-        .memory-fields .full-width {
-            grid-column: 1 / -1;
-        }
+        .memory-fields .full-width { grid-column: 1 / -1; }
 
-        .memory-image-area {
-            margin-top: 0.75rem;
-        }
+        .memory-image-area { margin-top: 0.75rem; }
 
-        .memory-image-area .drop-zone {
-            padding: 1.25rem;
-        }
+        .memory-image-area .drop-zone { padding: 1.25rem; }
 
         .memory-image-preview {
             margin-top: 0.5rem;
@@ -600,9 +544,35 @@
             overflow: hidden;
         }
 
-        .memory-image-preview img {
-            width: 100%;
-            display: block;
+        .memory-image-preview img { width: 100%; display: block; }
+
+        /* ===== Size Indicator ===== */
+        .size-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .size-indicator.good {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+
+        .size-indicator.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+        }
+
+        .size-indicator.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
         }
 
         /* ===== Step 3: Publish ===== */
@@ -622,10 +592,7 @@
             gap: 1rem;
         }
 
-        .summary-item .summary-emoji {
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
+        .summary-item .summary-emoji { font-size: 1.5rem; flex-shrink: 0; }
 
         .summary-item .summary-text h4 {
             font-weight: 600;
@@ -663,9 +630,7 @@
             animation: fadeSlideIn 0.5s ease forwards;
         }
 
-        .share-box.visible {
-            display: block;
-        }
+        .share-box.visible { display: block; }
 
         .share-box h3 {
             font-size: 1.5rem;
@@ -694,7 +659,7 @@
             border-radius: 12px;
             color: #86efac;
             font-family: 'Mali', monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             outline: none;
         }
 
@@ -722,9 +687,7 @@
             gap: 1.5rem;
         }
 
-        .loading-overlay.visible {
-            display: flex;
-        }
+        .loading-overlay.visible { display: flex; }
 
         .loading-spinner {
             width: 50px;
@@ -735,9 +698,7 @@
             animation: spin 1s linear infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .loading-text {
             font-size: 1.1rem;
@@ -745,26 +706,8 @@
             font-weight: 600;
         }
 
-        .loading-progress {
-            width: 300px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .loading-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #f472b6, #a855f7);
-            border-radius: 3px;
-            transition: width 0.3s;
-            width: 0%;
-        }
-
-        /* ===== Dashboard View ===== */
-        .dashboard {
-            animation: fadeSlideIn 0.5s ease forwards;
-        }
+        /* ===== Dashboard ===== */
+        .dashboard { animation: fadeSlideIn 0.5s ease forwards; }
 
         .dashboard-header {
             display: flex;
@@ -773,10 +716,7 @@
             margin-bottom: 2rem;
         }
 
-        .project-list {
-            display: grid;
-            gap: 1rem;
-        }
+        .project-list { display: grid; gap: 1rem; }
 
         .project-card {
             background: rgba(255, 255, 255, 0.03);
@@ -795,8 +735,7 @@
         }
 
         .project-card .project-icon {
-            width: 48px;
-            height: 48px;
+            width: 48px; height: 48px;
             background: linear-gradient(135deg, rgba(244,114,182,0.15), rgba(168,85,247,0.15));
             border-radius: 14px;
             display: flex;
@@ -806,10 +745,7 @@
             flex-shrink: 0;
         }
 
-        .project-card .project-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .project-card .project-info { flex: 1; min-width: 0; }
 
         .project-card .project-name {
             font-weight: 700;
@@ -836,10 +772,7 @@
             padding: 4rem 2rem;
         }
 
-        .empty-state .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
+        .empty-state .empty-icon { font-size: 4rem; margin-bottom: 1rem; }
 
         .empty-state h3 {
             font-size: 1.25rem;
@@ -853,7 +786,7 @@
             margin-bottom: 1.5rem;
         }
 
-        /* ===== Toast Notification ===== */
+        /* ===== Toast ===== */
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -870,40 +803,38 @@
             backdrop-filter: blur(10px);
         }
 
-        .toast.visible {
-            transform: translateX(-50%) translateY(0);
+        .toast.visible { transform: translateX(-50%) translateY(0); }
+        .toast.error { background: rgba(239, 68, 68, 0.9); }
+
+        /* ===== Info Banner ===== */
+        .info-banner {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 14px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: #a5b4fc;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
         }
 
-        .toast.error {
-            background: rgba(239, 68, 68, 0.9);
-        }
+        .info-banner .info-icon { font-size: 1.2rem; flex-shrink: 0; }
 
         /* ===== Responsive ===== */
         @media (max-width: 640px) {
-            .container {
-                padding: 1rem;
-            }
+            .container { padding: 1rem; }
 
             .glass-card {
                 padding: 1.25rem;
                 border-radius: 18px;
             }
 
-            .levels-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .memory-fields {
-                grid-template-columns: 1fr;
-            }
-
-            .progress-step .step-label {
-                display: none;
-            }
-
-            .section-title {
-                font-size: 1.35rem;
-            }
+            .levels-grid { grid-template-columns: 1fr 1fr; }
+            .memory-fields { grid-template-columns: 1fr; }
+            .progress-step .step-label { display: none; }
+            .section-title { font-size: 1.35rem; }
 
             .step-actions {
                 flex-direction: column-reverse;
@@ -915,13 +846,9 @@
                 justify-content: center;
             }
 
-            .share-link-input {
-                flex-direction: column;
-            }
+            .share-link-input { flex-direction: column; }
 
-            .project-card {
-                flex-wrap: wrap;
-            }
+            .project-card { flex-wrap: wrap; }
 
             .project-card .project-actions {
                 width: 100%;
@@ -939,16 +866,14 @@
             <div class="logo-icon">🎉</div>
             Surprise Creator
         </div>
-        <div class="header-actions">
-            <button class="btn btn-ghost" onclick="showDashboard()" id="btn-dashboard">📋 โปรเจคของฉัน</button>
+        <div>
+            <button class="btn btn-ghost" onclick="showDashboard()">📋 โปรเจคของฉัน</button>
         </div>
     </header>
 
     <div class="container">
 
-        <!-- ============================== -->
-        <!-- Dashboard View                 -->
-        <!-- ============================== -->
+        <!-- Dashboard View -->
         <div id="view-dashboard" class="dashboard">
             <div class="dashboard-header">
                 <div>
@@ -956,6 +881,11 @@
                     <p class="section-subtitle">จัดการโปรเจค Surprise ทั้งหมดของคุณ</p>
                 </div>
                 <button class="btn btn-primary" onclick="startNewProject()">✨ สร้างใหม่</button>
+            </div>
+
+            <div class="info-banner">
+                <span class="info-icon">💡</span>
+                <div>ข้อมูลทั้งหมดจะถูกบีบอัดลงในลิงค์โดยตรง — <strong>ไม่ต้องใช้ database!</strong> ใช้งานได้กับ Netlify, GitHub Pages หรือ static hosting ทุกแบบ</div>
             </div>
 
             <div id="project-list" class="project-list">
@@ -968,9 +898,7 @@
             </div>
         </div>
 
-        <!-- ============================== -->
-        <!-- Wizard View                    -->
-        <!-- ============================== -->
+        <!-- Wizard View -->
         <div id="view-wizard" style="display: none;">
 
             <!-- Progress Bar -->
@@ -991,7 +919,7 @@
                 </div>
             </div>
 
-            <!-- ===== STEP 1: Create Project ===== -->
+            <!-- STEP 1: Create Project -->
             <div id="step-1" class="step-content active">
                 <div class="glass-card">
                     <h2 class="section-title">สร้าง Surprise ใหม่ ✨</h2>
@@ -1045,17 +973,25 @@
                 </div>
             </div>
 
-            <!-- ===== STEP 2: Configure Levels ===== -->
+            <!-- STEP 2: Configure Levels -->
             <div id="step-2" class="step-content">
                 <div class="glass-card">
                     <h2 class="section-title">ตั้งค่าแต่ละด่าน 🎯</h2>
                     <p class="section-subtitle">กรอกข้อมูลและอัพโหลดรูปสำหรับแต่ละด่าน</p>
 
-                    <!-- Dynamic Tabs -->
-                    <div class="level-tabs" id="config-tabs"></div>
+                    <div class="info-banner">
+                        <span class="info-icon">📷</span>
+                        <div>รูปภาพจะถูกบีบอัดอัตโนมัติ เพื่อให้ลิงค์ไม่ยาวเกินไป แนะนำ <strong>ไม่เกิน 5 รูป</strong> ต่อด่าน</div>
+                    </div>
 
-                    <!-- Dynamic Config Forms -->
+                    <div class="level-tabs" id="config-tabs"></div>
                     <div id="config-forms"></div>
+
+                    <!-- Size indicator -->
+                    <div class="size-indicator good" id="size-indicator" style="display:none;">
+                        <span>📊</span>
+                        <span id="size-text">ขนาดข้อมูล: 0 KB</span>
+                    </div>
 
                     <div class="step-actions">
                         <button class="btn btn-secondary" onclick="goToStep(1)">← ก่อนหน้า</button>
@@ -1064,28 +1000,29 @@
                 </div>
             </div>
 
-            <!-- ===== STEP 3: Publish ===== -->
+            <!-- STEP 3: Publish -->
             <div id="step-3" class="step-content">
                 <div class="glass-card">
                     <h2 class="section-title">พร้อมเผยแพร่! 🚀</h2>
-                    <p class="section-subtitle">ตรวจสอบข้อมูลและกด Publish</p>
+                    <p class="section-subtitle">ตรวจสอบข้อมูลและสร้างลิงค์แชร์</p>
 
                     <div class="publish-summary" id="publish-summary"></div>
 
                     <div id="publish-actions" style="text-align: center; margin-bottom: 2rem;">
                         <button class="btn btn-primary" onclick="publishProject()" id="btn-publish" style="font-size: 1.1rem; padding: 0.85rem 3rem;">
-                            🚀 เผยแพร่ Surprise!
+                            🚀 สร้างลิงค์ Surprise!
                         </button>
                     </div>
 
-                    <!-- Share Link Box (hidden until published) -->
+                    <!-- Share Link Box -->
                     <div class="share-box" id="share-box">
-                        <h3>🎉 เผยแพร่สำเร็จ!</h3>
+                        <h3>🎉 สร้างลิงค์สำเร็จ!</h3>
                         <p>คัดลอกลิงค์นี้ส่งให้คนพิเศษของคุณ</p>
                         <div class="share-link-input">
                             <input type="text" id="share-link-url" readonly>
                             <button class="btn btn-primary" onclick="copyShareLink()">📋 คัดลอก</button>
                         </div>
+                        <p style="color:#475569; font-size:0.8rem; margin-top:1rem;">💡 ลิงค์นี้มีข้อมูลทั้งหมดอยู่แล้ว ไม่ต้องมี database!</p>
                     </div>
 
                     <div class="step-actions">
@@ -1100,35 +1037,60 @@
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loading-overlay">
         <div class="loading-spinner"></div>
-        <div class="loading-text" id="loading-text">กำลังอัพโหลด...</div>
-        <div class="loading-progress">
-            <div class="loading-progress-bar" id="loading-progress-bar"></div>
-        </div>
+        <div class="loading-text" id="loading-text">กำลังบีบอัดข้อมูล...</div>
     </div>
 
     <!-- Toast -->
     <div class="toast" id="toast"></div>
-
-    <!-- Firebase Config -->
-    <script src="js/firebase-config.js"></script>
 
     <script>
         // =============================================
         //  STATE
         // =============================================
         let currentStep = 1;
-        let projectId = null;
         let selectedLevels = [];
-        let levelConfigs = {}; // { levelNum: { ...data, files: [] } }
+        let levelConfigs = {};
 
         const LEVEL_DEFS = {
-            1: { emoji: '🔐', name: 'รหัสลับ', section: 'section-password' },
-            2: { emoji: '📸', name: 'ความทรงจำ', section: 'section-timeline' },
-            3: { emoji: '🔋', name: 'ชาร์จพลังรัก', section: 'section-loading' },
-            4: { emoji: '🌌', name: 'จักรวาลของเรา', section: 'section-universe' },
-            5: { emoji: '💌', name: 'จดหมายรัก', section: 'section-letter' },
-            6: { emoji: '🎮', name: 'คำถามสำคัญ', section: 'section-question' }
+            1: { emoji: '🔐', name: 'รหัสลับ' },
+            2: { emoji: '📸', name: 'ความทรงจำ' },
+            3: { emoji: '🔋', name: 'ชาร์จพลังรัก' },
+            4: { emoji: '🌌', name: 'จักรวาลของเรา' },
+            5: { emoji: '💌', name: 'จดหมายรัก' },
+            6: { emoji: '🎮', name: 'คำถามสำคัญ' }
         };
+
+        // =============================================
+        //  IMAGE COMPRESSION (Client-side)
+        // =============================================
+        function compressImage(file, maxWidth = 480, quality = 0.5) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+
+                        if (w > maxWidth) {
+                            h = Math.round((h * maxWidth) / w);
+                            w = maxWidth;
+                        }
+
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
 
         // =============================================
         //  DASHBOARD
@@ -1140,10 +1102,10 @@
         }
 
         function loadProjects() {
-            const projectIds = JSON.parse(localStorage.getItem('surprise_projects') || '[]');
+            const projects = JSON.parse(localStorage.getItem('surprise_projects') || '[]');
             const listEl = document.getElementById('project-list');
 
-            if (projectIds.length === 0) {
+            if (projects.length === 0) {
                 listEl.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">🎁</div>
@@ -1154,91 +1116,51 @@
                 return;
             }
 
-            listEl.innerHTML = '<div style="text-align:center; color:#64748b; padding:2rem;">กำลังโหลด...</div>';
-
-            // Load each project from Firestore
-            Promise.all(projectIds.map(id =>
-                db.collection('projects').doc(id).get()
-                    .then(doc => doc.exists ? { id: doc.id, ...doc.data() } : null)
-                    .catch(() => null)
-            )).then(projects => {
-                const validProjects = projects.filter(p => p !== null);
-
-                if (validProjects.length === 0) {
-                    listEl.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">🎁</div>
-                            <h3>ยังไม่มีโปรเจค</h3>
-                            <p>สร้าง Surprise แรกของคุณเลย!</p>
-                            <button class="btn btn-primary" onclick="startNewProject()">✨ สร้างโปรเจคใหม่</button>
-                        </div>`;
-                    return;
-                }
-
-                listEl.innerHTML = validProjects.map(p => {
-                    const date = p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleDateString('th-TH') : '-';
-                    const levelEmojis = (p.levels || []).map(l => LEVEL_DEFS[l]?.emoji || '').join(' ');
-                    const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
-                    const shareUrl = baseUrl + '?id=' + p.id;
-
-                    return `
-                    <div class="project-card">
-                        <div class="project-icon">🎁</div>
-                        <div class="project-info">
-                            <div class="project-name">${escapeHtml(p.name || 'Untitled')}</div>
-                            <div class="project-meta">${levelEmojis} · สร้างเมื่อ ${date}</div>
-                        </div>
-                        <div class="project-actions">
-                            <button class="btn btn-secondary" onclick="copyLink('${shareUrl}')" title="คัดลอกลิงค์">📋 ลิงค์</button>
-                            <button class="btn btn-danger" onclick="deleteProject('${p.id}')" title="ลบ">🗑️</button>
-                        </div>
-                    </div>`;
-                }).join('');
-            });
+            listEl.innerHTML = projects.map((p, i) => {
+                const date = new Date(p.createdAt).toLocaleDateString('th-TH');
+                return `
+                <div class="project-card">
+                    <div class="project-icon">🎁</div>
+                    <div class="project-info">
+                        <div class="project-name">${escapeHtml(p.name)}</div>
+                        <div class="project-meta">${p.levelCount} ด่าน · สร้างเมื่อ ${date}</div>
+                    </div>
+                    <div class="project-actions">
+                        <button class="btn btn-secondary" onclick="copyLink('${escapeAttr(p.url)}')" title="คัดลอกลิงค์">📋 ลิงค์</button>
+                        <button class="btn btn-danger" onclick="deleteProject(${i})" title="ลบ">🗑️</button>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
-        async function deleteProject(id) {
+        function deleteProject(index) {
             if (!confirm('ต้องการลบโปรเจคนี้ใช่ไหม?')) return;
-
-            try {
-                await db.collection('projects').doc(id).delete();
-                // Remove from localStorage
-                let ids = JSON.parse(localStorage.getItem('surprise_projects') || '[]');
-                ids = ids.filter(pid => pid !== id);
-                localStorage.setItem('surprise_projects', JSON.stringify(ids));
-                showToast('ลบโปรเจคแล้ว');
-                loadProjects();
-            } catch (err) {
-                showToast('เกิดข้อผิดพลาด: ' + err.message, true);
-            }
+            let projects = JSON.parse(localStorage.getItem('surprise_projects') || '[]');
+            projects.splice(index, 1);
+            localStorage.setItem('surprise_projects', JSON.stringify(projects));
+            showToast('ลบโปรเจคแล้ว');
+            loadProjects();
         }
 
         function copyLink(url) {
-            navigator.clipboard.writeText(url).then(() => {
-                showToast('คัดลอกลิงค์แล้ว! 📋');
-            });
+            navigator.clipboard.writeText(url).then(() => showToast('คัดลอกลิงค์แล้ว! 📋'));
         }
 
         // =============================================
         //  WIZARD: START NEW PROJECT
         // =============================================
         function startNewProject() {
-            // Reset state
             currentStep = 1;
-            projectId = null;
             selectedLevels = [];
             levelConfigs = {};
 
-            // Reset UI
             document.getElementById('input-project-name').value = '';
             document.querySelectorAll('.level-select-card').forEach(c => c.classList.remove('selected'));
             document.getElementById('config-tabs').innerHTML = '';
             document.getElementById('config-forms').innerHTML = '';
             document.getElementById('share-box').classList.remove('visible');
-            document.getElementById('btn-publish').disabled = false;
             document.getElementById('publish-actions').style.display = 'block';
 
-            // Show wizard
             document.getElementById('view-dashboard').style.display = 'none';
             document.getElementById('view-wizard').style.display = 'block';
             updateProgressUI();
@@ -1246,56 +1168,37 @@
         }
 
         // =============================================
-        //  STEP 1: Select Levels
+        //  STEP 1
         // =============================================
-        function toggleLevel(card) {
-            card.classList.toggle('selected');
-        }
+        function toggleLevel(card) { card.classList.toggle('selected'); }
 
         function getSelectedLevels() {
-            const cards = document.querySelectorAll('.level-select-card.selected');
-            return Array.from(cards).map(c => parseInt(c.dataset.level)).sort((a, b) => a - b);
+            return Array.from(document.querySelectorAll('.level-select-card.selected'))
+                .map(c => parseInt(c.dataset.level)).sort((a, b) => a - b);
         }
 
         function goToStep2() {
             const name = document.getElementById('input-project-name').value.trim();
-            if (!name) {
-                showToast('กรุณาตั้งชื่อโปรเจค', true);
-                document.getElementById('input-project-name').focus();
-                return;
-            }
+            if (!name) { showToast('กรุณาตั้งชื่อโปรเจค', true); return; }
 
             selectedLevels = getSelectedLevels();
-            if (selectedLevels.length === 0) {
-                showToast('กรุณาเลือกอย่างน้อย 1 ด่าน', true);
-                return;
-            }
+            if (selectedLevels.length === 0) { showToast('กรุณาเลือกอย่างน้อย 1 ด่าน', true); return; }
 
-            // Generate project ID
-            if (!projectId) {
-                projectId = db.collection('projects').doc().id;
-            }
-
-            // Initialize level configs for new levels
             selectedLevels.forEach(lvl => {
-                if (!levelConfigs[lvl]) {
-                    levelConfigs[lvl] = getDefaultConfig(lvl);
-                }
+                if (!levelConfigs[lvl]) levelConfigs[lvl] = getDefaultConfig(lvl);
             });
 
-            // Build config UI
             buildConfigTabs();
             buildConfigForms();
-
             goToStep(2);
         }
 
         function getDefaultConfig(levelNum) {
             switch (levelNum) {
                 case 1: return { code: '', hint: '' };
-                case 2: return { memories: [{ date: '', title: '', desc: '', file: null, previewUrl: '' }] };
+                case 2: return { memories: [{ date: '', title: '', desc: '', imageData: '' }] };
                 case 3: return { completeMessage: 'หัวใจเต็มเปี่ยม! 💖💖💖' };
-                case 4: return { files: [], previewUrls: [], message: '' };
+                case 4: return { images: [], message: '' };
                 case 5: return { message: '' };
                 case 6: return { question: 'รักเค้าไหมคะ?', yesText: 'รักสิ! 💖', successMessage: 'เย้! รักเหมือนกันนน 💖' };
                 default: return {};
@@ -1306,35 +1209,23 @@
         //  STEP 2: Configure Levels
         // =============================================
         function buildConfigTabs() {
-            const tabsEl = document.getElementById('config-tabs');
-            tabsEl.innerHTML = selectedLevels.map((lvl, i) => {
+            document.getElementById('config-tabs').innerHTML = selectedLevels.map((lvl, i) => {
                 const def = LEVEL_DEFS[lvl];
-                return `<div class="level-tab ${i === 0 ? 'active' : ''}" data-level="${lvl}" onclick="switchTab(${lvl})">
-                    ${def.emoji} ${def.name} <span class="tab-check" id="tab-check-${lvl}" style="display:none">✓</span>
-                </div>`;
+                return `<div class="level-tab ${i === 0 ? 'active' : ''}" data-level="${lvl}" onclick="switchTab(${lvl})">${def.emoji} ${def.name}</div>`;
             }).join('');
         }
 
         function buildConfigForms() {
-            const formsEl = document.getElementById('config-forms');
-            formsEl.innerHTML = selectedLevels.map((lvl, i) => {
-                return `<div class="level-config ${i === 0 ? 'active' : ''}" id="config-${lvl}">
-                    ${getConfigFormHTML(lvl)}
-                </div>`;
-            }).join('');
-
-            // Restore existing data
+            document.getElementById('config-forms').innerHTML = selectedLevels.map((lvl, i) =>
+                `<div class="level-config ${i === 0 ? 'active' : ''}" id="config-${lvl}">${getConfigFormHTML(lvl)}</div>`
+            ).join('');
             selectedLevels.forEach(lvl => restoreFormData(lvl));
         }
 
         function switchTab(levelNum) {
-            // Save current tab data
             const currentTab = document.querySelector('.level-tab.active');
-            if (currentTab) {
-                saveFormData(parseInt(currentTab.dataset.level));
-            }
+            if (currentTab) saveFormData(parseInt(currentTab.dataset.level));
 
-            // Switch tabs
             document.querySelectorAll('.level-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.level-config').forEach(c => c.classList.remove('active'));
 
@@ -1344,79 +1235,72 @@
 
         function getConfigFormHTML(levelNum) {
             switch (levelNum) {
-                case 1:
-                    return `
-                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🔐 ตั้งค่ารหัสลับ</h3>
-                        <div class="form-group">
-                            <label class="form-label">รหัสผ่าน (6 หลัก)</label>
-                            <input type="text" class="form-input" id="cfg-password-code" maxlength="6" placeholder="เช่น 070925" 
-                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                case 1: return `
+                    <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🔐 ตั้งค่ารหัสลับ</h3>
+                    <div class="form-group">
+                        <label class="form-label">รหัสผ่าน (6 หลัก)</label>
+                        <input type="text" class="form-input" id="cfg-password-code" maxlength="6" placeholder="เช่น 070925"
+                               oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">คำใบ้ (Hint)</label>
+                        <input type="text" class="form-input" id="cfg-password-hint" placeholder="เช่น วันครบรอบของเรา (ววดดปป)">
+                    </div>`;
+
+                case 2: return `
+                    <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">📸 ตั้งค่าความทรงจำ</h3>
+                    <div id="memories-container"></div>
+                    <button class="btn btn-secondary" onclick="addMemory()" style="margin-top:0.5rem;">+ เพิ่มความทรงจำ</button>`;
+
+                case 3: return `
+                    <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🔋 ตั้งค่าชาร์จพลังรัก</h3>
+                    <div class="form-group">
+                        <label class="form-label">ข้อความเมื่อชาร์จเสร็จ</label>
+                        <input type="text" class="form-input" id="cfg-charge-message" placeholder="หัวใจเต็มเปี่ยม! 💖💖💖">
+                    </div>
+                    <p style="color:#64748b; font-size:0.85rem;">ด่านนี้ผู้เล่นจะกดค้างเพื่อชาร์จหัวใจให้เต็ม ❤️</p>`;
+
+                case 4: return `
+                    <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🌌 ตั้งค่าจักรวาลของเรา</h3>
+                    <div class="form-group">
+                        <label class="form-label">อัพโหลดรูป (แนะนำ 3-5 รูป)</label>
+                        <div class="drop-zone" id="universe-dropzone"
+                             ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleUniverseDrop(event)">
+                            <span class="drop-zone-icon">🖼️</span>
+                            <div class="drop-zone-text">ลากรูปมาวาง หรือคลิกเพื่อเลือก</div>
+                            <div class="drop-zone-hint">รูปจะถูกบีบอัดอัตโนมัติ (สูงสุด 5MB/รูป)</div>
+                            <input type="file" accept="image/*" multiple onchange="handleUniverseFiles(this.files)">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">คำใบ้ (Hint)</label>
-                            <input type="text" class="form-input" id="cfg-password-hint" placeholder="เช่น วันครบรอบของเรา (ววดดปป)">
-                        </div>`;
+                        <div class="image-previews" id="universe-previews"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ข้อความ Anniversary</label>
+                        <textarea class="form-textarea" id="cfg-universe-message" placeholder="ขอบคุณที่อยู่เคียงข้างกัน..."></textarea>
+                    </div>`;
 
-                case 2:
-                    return `
-                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">📸 ตั้งค่าความทรงจำ</h3>
-                        <div id="memories-container"></div>
-                        <button class="btn btn-secondary" onclick="addMemory()" style="margin-top:0.5rem;">+ เพิ่มความทรงจำ</button>`;
+                case 5: return `
+                    <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">💌 ตั้งค่าจดหมายรัก</h3>
+                    <div class="form-group">
+                        <label class="form-label">ข้อความในจดหมาย</label>
+                        <textarea class="form-textarea" id="cfg-letter-message" placeholder="เขียนจดหมายรักของคุณที่นี่...&#10;เช่น ขอบคุณที่เข้ามาในชีวิตนะ 💕" style="min-height:180px;"></textarea>
+                    </div>`;
 
-                case 3:
-                    return `
-                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🔋 ตั้งค่าชาร์จพลังรัก</h3>
-                        <div class="form-group">
-                            <label class="form-label">ข้อความเมื่อชาร์จเสร็จ</label>
-                            <input type="text" class="form-input" id="cfg-charge-message" placeholder="หัวใจเต็มเปี่ยม! 💖💖💖">
-                        </div>
-                        <p style="color:#64748b; font-size:0.85rem;">ด่านนี้ผู้เล่นจะกดค้างเพื่อชาร์จหัวใจให้เต็ม ❤️</p>`;
+                case 6: return `
+                    <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🎮 ตั้งค่าคำถามสำคัญ</h3>
+                    <div class="form-group">
+                        <label class="form-label">คำถาม</label>
+                        <input type="text" class="form-input" id="cfg-question-text" placeholder="รักเค้าไหมคะ?">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ข้อความปุ่ม Yes</label>
+                        <input type="text" class="form-input" id="cfg-question-yes" placeholder="รักสิ! 💖">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ข้อความเมื่อตอบ Yes</label>
+                        <input type="text" class="form-input" id="cfg-question-success" placeholder="เย้! รักเหมือนกันนน 💖">
+                    </div>`;
 
-                case 4:
-                    return `
-                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🌌 ตั้งค่าจักรวาลของเรา</h3>
-                        <div class="form-group">
-                            <label class="form-label">อัพโหลดรูป (5-10 รูป)</label>
-                            <div class="drop-zone" id="universe-dropzone"
-                                 ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleUniverseDrop(event)">
-                                <span class="drop-zone-icon">🖼️</span>
-                                <div class="drop-zone-text">ลากรูปมาวาง หรือคลิกเพื่อเลือก</div>
-                                <div class="drop-zone-hint">รองรับ JPG, PNG, WEBP (สูงสุด 5MB/รูป)</div>
-                                <input type="file" accept="image/*" multiple onchange="handleUniverseFiles(this.files)">
-                            </div>
-                            <div class="image-previews" id="universe-previews"></div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">ข้อความ Anniversary</label>
-                            <textarea class="form-textarea" id="cfg-universe-message" placeholder="ขอบคุณที่อยู่เคียงข้างกัน..."></textarea>
-                        </div>`;
-
-                case 5:
-                    return `
-                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">💌 ตั้งค่าจดหมายรัก</h3>
-                        <div class="form-group">
-                            <label class="form-label">ข้อความในจดหมาย</label>
-                            <textarea class="form-textarea" id="cfg-letter-message" placeholder="เขียนจดหมายรักของคุณที่นี่...&#10;เช่น ขอบคุณที่เข้ามาในชีวิตนะ 💕" style="min-height:180px;"></textarea>
-                        </div>`;
-
-                case 6:
-                    return `
-                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🎮 ตั้งค่าคำถามสำคัญ</h3>
-                        <div class="form-group">
-                            <label class="form-label">คำถาม</label>
-                            <input type="text" class="form-input" id="cfg-question-text" placeholder="รักเค้าไหมคะ?">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">ข้อความปุ่ม Yes</label>
-                            <input type="text" class="form-input" id="cfg-question-yes" placeholder="รักสิ! 💖">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">ข้อความเมื่อตอบ Yes</label>
-                            <input type="text" class="form-input" id="cfg-question-success" placeholder="เย้! รักเหมือนกันนน 💖">
-                        </div>`;
-
-                default:
-                    return '<p>ไม่มีการตั้งค่าสำหรับด่านนี้</p>';
+                default: return '';
             }
         }
 
@@ -1424,7 +1308,6 @@
         function renderMemories() {
             const container = document.getElementById('memories-container');
             if (!container) return;
-
             const config = levelConfigs[2];
             if (!config) return;
 
@@ -1450,9 +1333,9 @@
                     </div>
                     <div class="memory-image-area">
                         <label class="form-label">รูปภาพ</label>
-                        ${mem.previewUrl ? `
+                        ${mem.imageData ? `
                             <div class="memory-image-preview">
-                                <img src="${mem.previewUrl}" alt="Memory ${i + 1}">
+                                <img src="${mem.imageData}" alt="Memory ${i + 1}">
                             </div>
                             <button class="btn btn-ghost" onclick="removeMemoryImage(${i})" style="color:#f87171; font-size:0.8rem; margin-top:0.25rem;">✕ ลบรูป</button>
                         ` : `
@@ -1469,9 +1352,8 @@
 
         function addMemory() {
             if (!levelConfigs[2]) levelConfigs[2] = getDefaultConfig(2);
-            levelConfigs[2].memories.push({ date: '', title: '', desc: '', file: null, previewUrl: '' });
-            // Save existing data before re-render
             saveMemoryData();
+            levelConfigs[2].memories.push({ date: '', title: '', desc: '', imageData: '' });
             renderMemories();
         }
 
@@ -1484,51 +1366,44 @@
         function saveMemoryData() {
             const config = levelConfigs[2];
             if (!config) return;
-
             config.memories.forEach((mem, i) => {
-                const dateEl = document.getElementById(`mem-date-${i}`);
-                const titleEl = document.getElementById(`mem-title-${i}`);
-                const descEl = document.getElementById(`mem-desc-${i}`);
-                if (dateEl) mem.date = dateEl.value;
-                if (titleEl) mem.title = titleEl.value;
-                if (descEl) mem.desc = descEl.value;
+                const d = document.getElementById(`mem-date-${i}`);
+                const t = document.getElementById(`mem-title-${i}`);
+                const desc = document.getElementById(`mem-desc-${i}`);
+                if (d) mem.date = d.value;
+                if (t) mem.title = t.value;
+                if (desc) mem.desc = desc.value;
             });
         }
 
-        function handleMemoryImage(index, file) {
+        async function handleMemoryImage(index, file) {
             if (!file) return;
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('ไฟล์ใหญ่เกิน 5MB', true);
-                return;
-            }
+            if (file.size > 5 * 1024 * 1024) { showToast('ไฟล์ใหญ่เกิน 5MB', true); return; }
 
             saveMemoryData();
-            levelConfigs[2].memories[index].file = file;
+            showLoading('กำลังบีบอัดรูป...');
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                levelConfigs[2].memories[index].previewUrl = e.target.result;
+            try {
+                const compressed = await compressImage(file, 400, 0.45);
+                levelConfigs[2].memories[index].imageData = compressed;
                 renderMemories();
-            };
-            reader.readAsDataURL(file);
+                updateSizeIndicator();
+            } catch (err) {
+                showToast('เกิดข้อผิดพลาดในการบีบอัดรูป', true);
+            }
+            hideLoading();
         }
 
         function removeMemoryImage(index) {
             saveMemoryData();
-            levelConfigs[2].memories[index].file = null;
-            levelConfigs[2].memories[index].previewUrl = '';
+            levelConfigs[2].memories[index].imageData = '';
             renderMemories();
+            updateSizeIndicator();
         }
 
         // ===== Universe Images =====
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.currentTarget.classList.add('dragover');
-        }
-
-        function handleDragLeave(e) {
-            e.currentTarget.classList.remove('dragover');
-        }
+        function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+        function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
 
         function handleUniverseDrop(e) {
             e.preventDefault();
@@ -1536,39 +1411,37 @@
             handleUniverseFiles(e.dataTransfer.files);
         }
 
-        function handleUniverseFiles(files) {
+        async function handleUniverseFiles(files) {
             if (!levelConfigs[4]) levelConfigs[4] = getDefaultConfig(4);
             const config = levelConfigs[4];
 
-            Array.from(files).forEach(file => {
-                if (!file.type.startsWith('image/')) return;
-                if (file.size > 5 * 1024 * 1024) {
-                    showToast(`${file.name} ใหญ่เกิน 5MB`, true);
-                    return;
-                }
-                if (config.files.length >= 10) {
-                    showToast('อัพโหลดได้สูงสุด 10 รูป', true);
-                    return;
-                }
+            showLoading('กำลังบีบอัดรูป...');
 
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    config.files.push(file);
-                    config.previewUrls.push(e.target.result);
-                    renderUniversePreviews();
-                };
-                reader.readAsDataURL(file);
-            });
+            for (const file of Array.from(files)) {
+                if (!file.type.startsWith('image/')) continue;
+                if (file.size > 5 * 1024 * 1024) { showToast(`${file.name} ใหญ่เกิน 5MB`, true); continue; }
+                if (config.images.length >= 8) { showToast('อัพโหลดได้สูงสุด 8 รูป', true); break; }
+
+                try {
+                    const compressed = await compressImage(file, 500, 0.45);
+                    config.images.push(compressed);
+                } catch (err) {
+                    showToast('บีบอัดรูปไม่สำเร็จ', true);
+                }
+            }
+
+            hideLoading();
+            renderUniversePreviews();
+            updateSizeIndicator();
         }
 
         function renderUniversePreviews() {
             const config = levelConfigs[4];
             if (!config) return;
-
             const container = document.getElementById('universe-previews');
             if (!container) return;
 
-            container.innerHTML = config.previewUrls.map((url, i) => `
+            container.innerHTML = config.images.map((url, i) => `
                 <div class="image-preview-item">
                     <img src="${url}" alt="Universe ${i + 1}">
                     <button class="remove-btn" onclick="removeUniverseImage(${i})">✕</button>
@@ -1577,10 +1450,32 @@
         }
 
         function removeUniverseImage(index) {
-            const config = levelConfigs[4];
-            config.files.splice(index, 1);
-            config.previewUrls.splice(index, 1);
+            levelConfigs[4].images.splice(index, 1);
             renderUniversePreviews();
+            updateSizeIndicator();
+        }
+
+        // ===== Size Indicator =====
+        function updateSizeIndicator() {
+            const indicator = document.getElementById('size-indicator');
+            const textEl = document.getElementById('size-text');
+
+            const data = buildProjectData();
+            const jsonStr = JSON.stringify(data);
+            const sizeKB = Math.round(jsonStr.length / 1024);
+
+            indicator.style.display = 'flex';
+
+            if (sizeKB < 200) {
+                indicator.className = 'size-indicator good';
+                textEl.textContent = `📊 ขนาดข้อมูล: ${sizeKB} KB — ดีมาก! ✓`;
+            } else if (sizeKB < 500) {
+                indicator.className = 'size-indicator warning';
+                textEl.textContent = `📊 ขนาดข้อมูล: ${sizeKB} KB — ปานกลาง (แนะนำลดรูป)`;
+            } else {
+                indicator.className = 'size-indicator danger';
+                textEl.textContent = `📊 ขนาดข้อมูล: ${sizeKB} KB — ใหญ่เกินไป! กรุณาลดรูป`;
+            }
         }
 
         // ===== Save/Restore Form Data =====
@@ -1590,38 +1485,31 @@
 
             switch (levelNum) {
                 case 1:
-                    const codeEl = document.getElementById('cfg-password-code');
-                    const hintEl = document.getElementById('cfg-password-hint');
-                    if (codeEl) config.code = codeEl.value;
-                    if (hintEl) config.hint = hintEl.value;
+                    const c = document.getElementById('cfg-password-code');
+                    const h = document.getElementById('cfg-password-hint');
+                    if (c) config.code = c.value;
+                    if (h) config.hint = h.value;
                     break;
-
-                case 2:
-                    saveMemoryData();
-                    break;
-
+                case 2: saveMemoryData(); break;
                 case 3:
-                    const chargeEl = document.getElementById('cfg-charge-message');
-                    if (chargeEl) config.completeMessage = chargeEl.value;
+                    const cm = document.getElementById('cfg-charge-message');
+                    if (cm) config.completeMessage = cm.value;
                     break;
-
                 case 4:
-                    const universeMsg = document.getElementById('cfg-universe-message');
-                    if (universeMsg) config.message = universeMsg.value;
+                    const um = document.getElementById('cfg-universe-message');
+                    if (um) config.message = um.value;
                     break;
-
                 case 5:
-                    const letterMsg = document.getElementById('cfg-letter-message');
-                    if (letterMsg) config.message = letterMsg.value;
+                    const lm = document.getElementById('cfg-letter-message');
+                    if (lm) config.message = lm.value;
                     break;
-
                 case 6:
-                    const qText = document.getElementById('cfg-question-text');
-                    const qYes = document.getElementById('cfg-question-yes');
-                    const qSuccess = document.getElementById('cfg-question-success');
-                    if (qText) config.question = qText.value;
-                    if (qYes) config.yesText = qYes.value;
-                    if (qSuccess) config.successMessage = qSuccess.value;
+                    const qt = document.getElementById('cfg-question-text');
+                    const qy = document.getElementById('cfg-question-yes');
+                    const qs = document.getElementById('cfg-question-success');
+                    if (qt) config.question = qt.value;
+                    if (qy) config.yesText = qy.value;
+                    if (qs) config.successMessage = qs.value;
                     break;
             }
         }
@@ -1632,60 +1520,42 @@
 
             switch (levelNum) {
                 case 1:
-                    const codeEl = document.getElementById('cfg-password-code');
-                    const hintEl = document.getElementById('cfg-password-hint');
-                    if (codeEl) codeEl.value = config.code || '';
-                    if (hintEl) hintEl.value = config.hint || '';
+                    const c = document.getElementById('cfg-password-code');
+                    const h = document.getElementById('cfg-password-hint');
+                    if (c) c.value = config.code || '';
+                    if (h) h.value = config.hint || '';
                     break;
-
-                case 2:
-                    renderMemories();
-                    break;
-
+                case 2: renderMemories(); break;
                 case 3:
-                    const chargeEl = document.getElementById('cfg-charge-message');
-                    if (chargeEl) chargeEl.value = config.completeMessage || '';
+                    const cm = document.getElementById('cfg-charge-message');
+                    if (cm) cm.value = config.completeMessage || '';
                     break;
-
                 case 4:
-                    const universeMsg = document.getElementById('cfg-universe-message');
-                    if (universeMsg) universeMsg.value = config.message || '';
+                    const um = document.getElementById('cfg-universe-message');
+                    if (um) um.value = config.message || '';
                     renderUniversePreviews();
                     break;
-
                 case 5:
-                    const letterMsg = document.getElementById('cfg-letter-message');
-                    if (letterMsg) letterMsg.value = config.message || '';
+                    const lm = document.getElementById('cfg-letter-message');
+                    if (lm) lm.value = config.message || '';
                     break;
-
                 case 6:
-                    const qText = document.getElementById('cfg-question-text');
-                    const qYes = document.getElementById('cfg-question-yes');
-                    const qSuccess = document.getElementById('cfg-question-success');
-                    if (qText) qText.value = config.question || '';
-                    if (qYes) qYes.value = config.yesText || '';
-                    if (qSuccess) qSuccess.value = config.successMessage || '';
+                    const qt = document.getElementById('cfg-question-text');
+                    const qy = document.getElementById('cfg-question-yes');
+                    const qs = document.getElementById('cfg-question-success');
+                    if (qt) qt.value = config.question || '';
+                    if (qy) qy.value = config.yesText || '';
+                    if (qs) qs.value = config.successMessage || '';
                     break;
             }
         }
 
         // =============================================
-        //  STEP 3: Preview & Publish
+        //  STEP 3
         // =============================================
         function goToStep3() {
-            // Save current tab data
-            const currentTab = document.querySelector('.level-tab.active');
-            if (currentTab) {
-                saveFormData(parseInt(currentTab.dataset.level));
-            }
-
-            // Save all tabs data
-            selectedLevels.forEach(lvl => {
-                const configEl = document.getElementById(`config-${lvl}`);
-                if (configEl) saveFormData(lvl);
-            });
-
-            // Build summary
+            // Save all tabs
+            selectedLevels.forEach(lvl => saveFormData(lvl));
             buildPublishSummary();
             goToStep(3);
         }
@@ -1707,8 +1577,7 @@
             selectedLevels.forEach(lvl => {
                 const def = LEVEL_DEFS[lvl];
                 const config = levelConfigs[lvl];
-                let status = '';
-                let isComplete = false;
+                let status = '', isComplete = false;
 
                 switch (lvl) {
                     case 1:
@@ -1716,26 +1585,20 @@
                         status = isComplete ? `รหัส: ${config.code}` : 'ยังไม่ได้ตั้งรหัส';
                         break;
                     case 2:
-                        const memCount = config.memories.filter(m => m.title || m.date).length;
-                        isComplete = memCount > 0;
-                        status = `${memCount} ความทรงจำ`;
+                        const mc = config.memories.filter(m => m.title || m.date).length;
+                        isComplete = mc > 0;
+                        status = `${mc} ความทรงจำ`;
                         break;
-                    case 3:
-                        isComplete = true;
-                        status = config.completeMessage || 'ใช้ค่าเริ่มต้น';
-                        break;
+                    case 3: isComplete = true; status = config.completeMessage || 'ใช้ค่าเริ่มต้น'; break;
                     case 4:
-                        isComplete = config.files.length > 0 || config.previewUrls.length > 0;
-                        status = `${config.files.length} รูป`;
+                        isComplete = config.images.length > 0;
+                        status = `${config.images.length} รูป`;
                         break;
                     case 5:
                         isComplete = config.message && config.message.trim().length > 0;
                         status = isComplete ? 'มีข้อความแล้ว' : 'ยังไม่ได้เขียนข้อความ';
                         break;
-                    case 6:
-                        isComplete = true;
-                        status = config.question || 'ใช้ค่าเริ่มต้น';
-                        break;
+                    case 6: isComplete = true; status = config.question || 'ใช้ค่าเริ่มต้น'; break;
                 }
 
                 html += `
@@ -1753,146 +1616,96 @@
         }
 
         // =============================================
-        //  PUBLISH
+        //  BUILD PROJECT DATA & PUBLISH
         // =============================================
-        async function publishProject() {
-            const projectName = document.getElementById('input-project-name').value.trim();
+        function buildProjectData() {
+            const levelData = {};
 
-            showLoading('กำลังเตรียมข้อมูล...');
-
-            try {
-                let totalFiles = 0;
-                let uploadedFiles = 0;
-
-                // Count total files
-                selectedLevels.forEach(lvl => {
-                    const config = levelConfigs[lvl];
-                    if (lvl === 2) {
-                        totalFiles += config.memories.filter(m => m.file).length;
-                    } else if (lvl === 4) {
-                        totalFiles += config.files.length;
-                    }
-                });
-
-                // Build level data
-                const levelData = {};
-
-                for (const lvl of selectedLevels) {
-                    const config = levelConfigs[lvl];
-
-                    switch (lvl) {
-                        case 1:
-                            levelData.password = {
-                                code: config.code || '000000',
-                                hint: config.hint || ''
-                            };
-                            break;
-
-                        case 2:
-                            const memories = [];
-                            for (let i = 0; i < config.memories.length; i++) {
-                                const mem = config.memories[i];
-                                let imageUrl = '';
-
-                                if (mem.file) {
-                                    updateLoading(`อัพโหลดรูป Memory ${i + 1}...`, (uploadedFiles / Math.max(totalFiles, 1)) * 100);
-                                    const path = `projects/${projectId}/timeline/memory_${i}_${Date.now()}`;
-                                    const ref = storage.ref().child(path);
-                                    await ref.put(mem.file);
-                                    imageUrl = await ref.getDownloadURL();
-                                    uploadedFiles++;
-                                }
-
-                                memories.push({
-                                    date: mem.date || '',
-                                    title: mem.title || '',
-                                    desc: mem.desc || '',
-                                    imageUrl: imageUrl
-                                });
-                            }
-                            levelData.timeline = { memories };
-                            break;
-
-                        case 3:
-                            levelData.charging = {
-                                completeMessage: config.completeMessage || 'หัวใจเต็มเปี่ยม! 💖💖💖'
-                            };
-                            break;
-
-                        case 4:
-                            const universeImages = [];
-                            for (let i = 0; i < config.files.length; i++) {
-                                updateLoading(`อัพโหลดรูป Universe ${i + 1}...`, (uploadedFiles / Math.max(totalFiles, 1)) * 100);
-                                const path = `projects/${projectId}/universe/img_${i}_${Date.now()}`;
-                                const ref = storage.ref().child(path);
-                                await ref.put(config.files[i]);
-                                const url = await ref.getDownloadURL();
-                                universeImages.push(url);
-                                uploadedFiles++;
-                            }
-                            levelData.universe = {
-                                images: universeImages,
-                                message: config.message || ''
-                            };
-                            break;
-
-                        case 5:
-                            levelData.letter = {
-                                message: config.message || ''
-                            };
-                            break;
-
-                        case 6:
-                            levelData.question = {
-                                question: config.question || 'รักเค้าไหมคะ?',
-                                yesText: config.yesText || 'รักสิ! 💖',
-                                successMessage: config.successMessage || 'เย้! รักเหมือนกันนน 💖'
-                            };
-                            break;
-                    }
+            selectedLevels.forEach(lvl => {
+                const config = levelConfigs[lvl];
+                switch (lvl) {
+                    case 1:
+                        levelData.password = { code: config.code || '000000', hint: config.hint || '' };
+                        break;
+                    case 2:
+                        levelData.timeline = {
+                            memories: config.memories.map(m => ({
+                                date: m.date || '', title: m.title || '',
+                                desc: m.desc || '', imageUrl: m.imageData || ''
+                            }))
+                        };
+                        break;
+                    case 3:
+                        levelData.charging = { completeMessage: config.completeMessage || 'หัวใจเต็มเปี่ยม! 💖💖💖' };
+                        break;
+                    case 4:
+                        levelData.universe = { images: config.images || [], message: config.message || '' };
+                        break;
+                    case 5:
+                        levelData.letter = { message: config.message || '' };
+                        break;
+                    case 6:
+                        levelData.question = {
+                            question: config.question || 'รักเค้าไหมคะ?',
+                            yesText: config.yesText || 'รักสิ! 💖',
+                            successMessage: config.successMessage || 'เย้! รักเหมือนกันนน 💖'
+                        };
+                        break;
                 }
+            });
 
-                // Save to Firestore
-                updateLoading('กำลังบันทึกโปรเจค...', 95);
+            return {
+                name: document.getElementById('input-project-name').value.trim(),
+                levels: selectedLevels,
+                levelData: levelData
+            };
+        }
 
-                await db.collection('projects').doc(projectId).set({
-                    name: projectName,
-                    levels: selectedLevels,
-                    levelData: levelData,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'published'
-                });
+        function publishProject() {
+            showLoading('กำลังบีบอัดข้อมูล...');
 
-                // Save to localStorage
-                const savedIds = JSON.parse(localStorage.getItem('surprise_projects') || '[]');
-                if (!savedIds.includes(projectId)) {
-                    savedIds.push(projectId);
-                    localStorage.setItem('surprise_projects', JSON.stringify(savedIds));
+            // Use setTimeout to allow UI to update
+            setTimeout(() => {
+                try {
+                    const data = buildProjectData();
+                    const jsonStr = JSON.stringify(data);
+
+                    // Compress with LZ-String
+                    const compressed = LZString.compressToEncodedURIComponent(jsonStr);
+
+                    // Build share URL
+                    const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
+                    const shareUrl = baseUrl + '#' + compressed;
+
+                    // Save reference in localStorage
+                    const projects = JSON.parse(localStorage.getItem('surprise_projects') || '[]');
+                    projects.push({
+                        name: data.name,
+                        url: shareUrl,
+                        levelCount: selectedLevels.length,
+                        createdAt: new Date().toISOString()
+                    });
+                    localStorage.setItem('surprise_projects', JSON.stringify(projects));
+
+                    // Show share link
+                    document.getElementById('share-link-url').value = shareUrl;
+                    document.getElementById('share-box').classList.add('visible');
+                    document.getElementById('publish-actions').style.display = 'none';
+
+                    hideLoading();
+                    showToast('🎉 สร้างลิงค์สำเร็จ!');
+
+                } catch (error) {
+                    hideLoading();
+                    showToast('เกิดข้อผิดพลาด: ' + error.message, true);
+                    console.error(error);
                 }
-
-                hideLoading();
-
-                // Show share link
-                const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
-                const shareUrl = baseUrl + '?id=' + projectId;
-                document.getElementById('share-link-url').value = shareUrl;
-                document.getElementById('share-box').classList.add('visible');
-                document.getElementById('publish-actions').style.display = 'none';
-
-                showToast('🎉 เผยแพร่สำเร็จ!');
-
-            } catch (error) {
-                hideLoading();
-                console.error('Publish error:', error);
-                showToast('เกิดข้อผิดพลาด: ' + error.message, true);
-            }
+            }, 100);
         }
 
         function copyShareLink() {
             const url = document.getElementById('share-link-url').value;
-            navigator.clipboard.writeText(url).then(() => {
-                showToast('คัดลอกลิงค์แล้ว! 📋');
-            });
+            navigator.clipboard.writeText(url).then(() => showToast('คัดลอกลิงค์แล้ว! 📋'));
         }
 
         // =============================================
@@ -1908,7 +1721,6 @@
             for (let i = 1; i <= 3; i++) {
                 const stepEl = document.getElementById(`prog-step-${i}`);
                 const lineEl = document.getElementById(`prog-line-${i}`);
-
                 stepEl.classList.remove('active', 'completed');
                 if (lineEl) lineEl.classList.remove('active');
 
@@ -1923,13 +1735,12 @@
 
         function showStepContent(step) {
             document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
-            const stepEl = document.getElementById(`step-${step}`);
-            if (stepEl) {
-                stepEl.classList.add('active');
-                // Re-trigger animation
-                stepEl.style.animation = 'none';
-                stepEl.offsetHeight; // trigger reflow
-                stepEl.style.animation = null;
+            const el = document.getElementById(`step-${step}`);
+            if (el) {
+                el.classList.add('active');
+                el.style.animation = 'none';
+                el.offsetHeight;
+                el.style.animation = null;
             }
         }
 
@@ -1943,6 +1754,10 @@
             return div.innerHTML;
         }
 
+        function escapeAttr(str) {
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -1951,15 +1766,9 @@
             setTimeout(() => toast.classList.remove('visible'), 3000);
         }
 
-        function showLoading(text, progress = 0) {
+        function showLoading(text) {
             document.getElementById('loading-text').textContent = text;
-            document.getElementById('loading-progress-bar').style.width = progress + '%';
             document.getElementById('loading-overlay').classList.add('visible');
-        }
-
-        function updateLoading(text, progress) {
-            document.getElementById('loading-text').textContent = text;
-            document.getElementById('loading-progress-bar').style.width = progress + '%';
         }
 
         function hideLoading() {
@@ -1969,9 +1778,7 @@
         // =============================================
         //  INIT
         // =============================================
-        document.addEventListener('DOMContentLoaded', () => {
-            showDashboard();
-        });
+        document.addEventListener('DOMContentLoaded', () => showDashboard());
     </script>
 </body>
 

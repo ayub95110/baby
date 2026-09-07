@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise! 💖</title>
+    <meta name="description" content="เซอร์ไพรส์สุดพิเศษจากคนพิเศษ">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Mali', cursive;
+            background-color: #fcf9f5;
+            color: #4a4a4a;
+            overflow-x: hidden;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out forwards;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+
+        .polaroid {
+            background: white;
+            padding: 10px 10px 30px 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+        }
+
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+
+        .memory-row {
+            transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+        }
+
+        .story-hidden {
+            opacity: 0;
+            transform: translateY(50px);
+            pointer-events: none;
+        }
+
+        .story-visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Password input styles */
+        .pass-input {
+            width: 40px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px solid #f472b6;
+            border-radius: 8px;
+            margin: 0 4px;
+            background: transparent;
+            color: #d946ef;
+        }
+
+        .pass-input:focus {
+            outline: none;
+            border-color: #d946ef;
+            box-shadow: 0 0 0 2px rgba(217, 70, 239, 0.2);
+        }
+
+        /* Confetti effect */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f472b6;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); }
+        }
+
+        /* Heartbeat & Floating Animations */
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.3); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.3); }
+            70% { transform: scale(1); }
+        }
+
+        .animate-heartbeat {
+            animation: heartbeat 1.5s infinite;
+        }
+
+        .floating-img {
+            animation: floatSpace 6s ease-in-out infinite;
+        }
+
+        @keyframes floatSpace {
+            0% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-15px) rotate(5deg) scale(1.05); }
+            100% { transform: translateY(0px) rotate(0deg) scale(1); }
+        }
+
+        /* Cinematic Scroll Animations */
+        @keyframes scrollLeft {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes scrollRight {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+
+        .animate-scroll-left {
+            animation: scrollLeft 30s linear infinite;
+            width: max-content;
+        }
+
+        .animate-scroll-right {
+            animation: scrollRight 30s linear infinite;
+            width: max-content;
+        }
+
+        /* Hide sections by default */
+        .section-hidden {
+            display: none !important;
+        }
+
+        /* Envelope Styles */
+        .envelope-wrapper {
+            position: relative;
+            width: 280px;
+            height: 200px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .envelope-wrapper:hover {
+            transform: translateY(-10px);
+        }
+
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #fbcfe8;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 120px solid #ec4899;
+            border-bottom: 80px solid transparent;
+            z-index: 3;
+            transform-origin: top;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .envelope.open::before {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+
+        .envelope::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid #f9a8d4;
+            border-right: 140px solid #f9a8d4;
+            border-bottom: 120px solid #f472b6;
+            border-top: 80px solid transparent;
+            z-index: 2;
+            pointer-events: none;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .letter {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            height: 170px;
+            background-color: white;
+            border-radius: 4px;
+            z-index: 1;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.6s ease-in-out;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .envelope.open .letter {
+            transform: translateY(-110px);
+        }
+
+        /* Retro Window Styles */
+        .retro-window {
+            background-color: #fdf2f8;
+            border: 3px solid #f472b6;
+            border-radius: 12px;
+            width: 320px;
+            box-shadow: 6px 6px 0px #f472b6;
+            overflow: hidden;
+            font-family: 'Mali', cursive;
+        }
+
+        .retro-header {
+            background-color: #f472b6;
+            color: white;
+            padding: 8px 16px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .retro-btn {
+            background-color: white;
+            border: 2px solid #f472b6;
+            color: #f472b6;
+            padding: 8px 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s;
+            border-radius: 8px;
+            box-shadow: 2px 2px 0px #f472b6;
+        }
+
+        .retro-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px #f472b6;
+        }
+
+        /* Loading screen */
+        .page-loader {
+            position: fixed;
+            inset: 0;
+            background: #fcf9f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .page-loader .loader-heart {
+            font-size: 3rem;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        .page-loader .loader-text {
+            color: #f472b6;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+
+        /* Landing page */
+        .landing-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .landing-container h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ec4899;
+            margin-bottom: 1rem;
+        }
+
+        .landing-container p {
+            color: #9ca3af;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .landing-container .btn-create {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: white;
+            padding: 0.85rem 2.5rem;
+            border: none;
+            border-radius: 100px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(244, 114, 182, 0.3);
+        }
+
+        .landing-container .btn-create:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(244, 114, 182, 0.4);
+        }
+
+        /* Error page */
+        .error-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center relative">
+
+    <!-- Page Loader -->
+    <div class="page-loader" id="page-loader">
+        <div class="loader-heart">💖</div>
+        <div class="loader-text">กำลังโหลด Surprise...</div>
+    </div>
+
+    <!-- Landing Page (no project ID) -->
+    <div id="landing-page" class="landing-container" style="display:none;">
+        <div style="font-size:5rem; margin-bottom:1rem;">🎁</div>
+        <h1>Surprise Creator</h1>
+        <p>สร้าง Surprise สุดพิเศษให้คนที่คุณรัก</p>
+        <button class="btn-create" onclick="window.location.href='admin.html'">✨ สร้าง Surprise เลย!</button>
+    </div>
+
+    <!-- Error Page -->
+    <div id="error-page" class="error-container" style="display:none;">
+        <div style="font-size:5rem; margin-bottom:1rem;">😢</div>
+        <h1 style="font-size:2rem; color:#ec4899; margin-bottom:0.5rem;">ไม่พบ Surprise นี้</h1>
+        <p style="color:#9ca3af;">ลิงค์อาจไม่ถูกต้องหรือถูกลบไปแล้ว</p>
+    </div>
+
+    <!-- Dynamic Content Container -->
+    <div id="app-container" style="display:none; width:100%;">
+        <!-- Section: Level Menu (dynamically populated) -->
+        <section id="section-menu" class="w-full max-w-4xl mx-auto p-6 flex flex-col items-center justify-center min-h-screen fade-in">
+            <h1 class="text-4xl md:text-5xl font-bold text-pink-500 mb-8 drop-shadow-sm text-center" id="menu-title">Our Journey 💖</h1>
+            <p class="text-gray-500 mb-10 text-lg">เลือกด่านความทรงจำของเราเลยยย 🥰</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-4" id="level-grid">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
+
+        <!-- Dynamic Level Sections Container -->
+        <div id="levels-container">
+            <!-- Levels are built dynamically by JS -->
+        </div>
+    </div>
+
+    <!-- Firebase Config -->
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        // =============================================
+        //  GLOBAL STATE
+        // =============================================
+        let projectData = null;
+
+        const LEVEL_DEFS = {
+            1: { emoji: '🔐', name: 'ด่านที่ 1: รหัสลับ', desc: 'ทายรหัสผ่านเพื่อปลดล็อคด่านต่อไป', section: 'section-password' },
+            2: { emoji: '📸', name: 'ด่านที่ 2: ความทรงจำ', desc: 'ย้อนดูเรื่องราวของเราทีละภาพ', section: 'section-timeline' },
+            3: { emoji: '🔋', name: 'ด่านที่ 3: ชาร์จพลังรัก', desc: 'กดค้างเพื่อเติมเต็มหัวใจดวงนี้', section: 'section-loading' },
+            4: { emoji: '🌌', name: 'ด่านที่ 4: จักรวาลของเรา', desc: 'ภาพยนตร์ความรักที่ไม่มีวันจบ', section: 'section-universe' },
+            5: { emoji: '💌', name: 'ด่านที่ 5: จดหมายรัก', desc: 'ความในใจที่อยากบอก', section: 'section-letter' },
+            6: { emoji: '🎮', name: 'ด่านที่ 6: คำถามสำคัญ', desc: 'คิดให้ดีก่อนตอบนะจ๊ะ', section: 'section-question' }
+        };
+
+        // =============================================
+        //  INITIALIZATION
+        // =============================================
+        async function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('id');
+
+            if (!projectId) {
+                hideLoader();
+                document.getElementById('landing-page').style.display = 'flex';
+                return;
+            }
+
+            try {
+                const doc = await db.collection('projects').doc(projectId).get();
+
+                if (!doc.exists) {
+                    hideLoader();
+                    document.getElementById('error-page').style.display = 'flex';
+                    return;
+                }
+
+                projectData = doc.data();
+                document.title = (projectData.name || 'Surprise') + ' 💖';
+
+                buildLevelMenu();
+                buildAllLevels();
+
+                hideLoader();
+                document.getElementById('app-container').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading project:', error);
+                hideLoader();
+                document.getElementById('error-page').style.display = 'flex';
+            }
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('page-loader');
+            loader.style.opacity = '0';
+            loader.style.transition = 'opacity 0.5s';
+            setTimeout(() => loader.style.display = 'none', 500);
+        }
+
+        // =============================================
+        //  BUILD LEVEL MENU
+        // =============================================
+        function buildLevelMenu() {
+            const grid = document.getElementById('level-grid');
+            grid.innerHTML = '';
+
+            projectData.levels.forEach(levelNum => {
+                const def = LEVEL_DEFS[levelNum];
+                if (!def) return;
+
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-3xl p-8 shadow-[0_10px_30px_rgba(244,114,182,0.15)] transform transition duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer border-2 border-transparent hover:border-pink-300 flex flex-col items-center text-center';
+                card.onclick = () => startLevel(def.section);
+                card.innerHTML = `
+                    <div class="text-6xl mb-4">${def.emoji}</div>
+                    <h3 class="text-2xl font-bold text-pink-500 mb-2">${def.name}</h3>
+                    <p class="text-gray-500">${def.desc}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // =============================================
+        //  BUILD ALL LEVELS
+        // =============================================
+        function buildAllLevels() {
+            const container = document.getElementById('levels-container');
+            container.innerHTML = '';
+
+            projectData.levels.forEach(levelNum => {
+                switch (levelNum) {
+                    case 1: buildPasswordLevel(container); break;
+                    case 2: buildTimelineLevel(container); break;
+                    case 3: buildChargingLevel(container); break;
+                    case 4: buildUniverseLevel(container); break;
+                    case 5: buildLetterLevel(container); break;
+                    case 6: buildQuestionLevel(container); break;
+                }
+            });
+        }
+
+        // ===== Level 1: Password =====
+        function buildPasswordLevel(container) {
+            const data = projectData.levelData?.password || {};
+            const hint = data.hint || 'ลองทายดูสิ~';
+
+            const section = document.createElement('section');
+            section.id = 'section-password';
+            section.className = 'w-full max-w-md mx-auto p-6 flex flex-col items-center justify-center text-center section-hidden relative min-h-screen';
+            section.innerHTML = `
+                <button onclick="goToMenu('section-password')" class="absolute top-4 left-4 bg-white/50 backdrop-blur px-4 py-2 rounded-full text-pink-500 font-semibold shadow z-50 hover:bg-pink-50 transition border border-pink-100">&larr; กลับหน้าหลัก</button>
+                <h2 class="text-3xl font-bold text-pink-500 mb-2 drop-shadow-sm">Enter our password 💖✨</h2>
+                <p class="text-gray-500 mb-6">รหัส 6 หลัก ทายซิ คืออะไร จุ๊บๆ</p>
+                <div class="flex justify-center mb-8">
+                    <input type="text" maxlength="1" class="pass-input" onkeyup="moveToNext(this, event)" id="p1">
+                    <input type="text" maxlength="1" class="pass-input" onkeyup="moveToNext(this, event)" id="p2">
+                    <input type="text" maxlength="1" class="pass-input" onkeyup="moveToNext(this, event)" id="p3">
+                    <input type="text" maxlength="1" class="pass-input" onkeyup="moveToNext(this, event)" id="p4">
+                    <input type="text" maxlength="1" class="pass-input" onkeyup="moveToNext(this, event)" id="p5">
+                    <input type="text" maxlength="1" class="pass-input" onkeyup="checkPassword()" id="p6">
+                </div>
+                <p id="error-msg" class="text-red-500 text-sm mb-4 hidden">รหัสผิดน้าา ลองใหม่ๆ 🥺</p>
+                <div id="auto-hint" class="bg-pink-100 py-2 px-6 rounded-full text-pink-600 inline-block shadow-inner hidden">
+                    💡 ใบ้ให้: ${escapeHtml(hint)}
+                </div>
+            `;
+            container.appendChild(section);
+        }
+
+        // ===== Level 2: Timeline =====
+        function buildTimelineLevel(container) {
+            const data = projectData.levelData?.timeline || {};
+            const memories = data.memories || [];
+
+            let memoriesHTML = memories.map((mem, i) => {
+                const isLeft = i % 2 === 0;
+                const rotation = ['rotate-[-2deg]', 'rotate-[3deg]', 'rotate-[-1deg]', 'rotate-[2deg]'][i % 4];
+
+                if (isLeft) {
+                    return `
+                    <div class="memory-row flex items-center justify-between w-full mb-12 relative story-hidden">
+                        <div class="absolute left-1/2 transform -translate-x-1/2 w-5 h-5 bg-white border-4 border-pink-400 rounded-full z-10 shadow-sm"></div>
+                        <div class="w-[45%] pr-4 md:pr-8 text-right">
+                            ${mem.imageUrl ? `<img src="${mem.imageUrl}" class="rounded-xl shadow-md inline-block w-full max-w-[200px] border-2 border-white transform ${rotation}" loading="lazy">` : ''}
+                        </div>
+                        <div class="w-[45%] pl-4 md:pl-8 text-left">
+                            <span class="block text-pink-500 font-bold text-lg mb-1">${escapeHtml(mem.date)}</span>
+                            <h3 class="text-gray-800 font-semibold mb-1">${escapeHtml(mem.title)}</h3>
+                            <p class="text-gray-600 text-sm md:text-base">${escapeHtml(mem.desc)}</p>
+                        </div>
+                    </div>`;
+                } else {
+                    return `
+                    <div class="memory-row flex items-center justify-between w-full mb-12 relative story-hidden">
+                        <div class="absolute left-1/2 transform -translate-x-1/2 w-5 h-5 bg-white border-4 border-pink-400 rounded-full z-10 shadow-sm"></div>
+                        <div class="w-[45%] pr-4 md:pr-8 text-right">
+                            <span class="block text-pink-500 font-bold text-lg mb-1">${escapeHtml(mem.date)}</span>
+                            <h3 class="text-gray-800 font-semibold mb-1">${escapeHtml(mem.title)}</h3>
+                            <p class="text-gray-600 text-sm md:text-base">${escapeHtml(mem.desc)}</p>
+                        </div>
+                        <div class="w-[45%] pl-4 md:pl-8 text-left">
+                            ${mem.imageUrl ? `<img src="${mem.imageUrl}" class="rounded-xl shadow-md inline-block w-full max-w-[200px] border-2 border-white transform ${rotation}" loading="lazy">` : ''}
+                        </div>
+                    </div>`;
+                }
+            }).join('');
+
+            const section = document.createElement('section');
+            section.id = 'section-timeline';
+            section.className = 'w-full max-w-3xl mx-auto p-4 py-16 section-hidden relative cursor-pointer min-h-screen';
+            section.onclick = () => revealNextMemory();
+            section.innerHTML = `
+                <button onclick="event.stopPropagation(); goToMenu('section-timeline')" class="absolute top-4 left-4 bg-white/80 backdrop-blur px-4 py-2 rounded-full text-pink-500 font-semibold shadow z-50 hover:bg-pink-50 transition border border-pink-100">&larr; กลับหน้าหลัก</button>
+                <h2 class="text-3xl font-bold text-pink-400 text-center mb-2">Our Memories 🤍</h2>
+                <p class="text-center text-gray-500 mb-12 animate-pulse">👆 คลิกที่หน้าจอเพื่อดูทีละความทรงจำ</p>
+                <div class="relative w-full pb-20">
+                    <div class="absolute top-0 bottom-0 left-1/2 w-1 bg-pink-200 transform -translate-x-1/2 rounded-full"></div>
+                    ${memoriesHTML}
+                </div>
+                <div id="timeline-next-btn" class="text-center mt-4 transition-opacity duration-500 opacity-0 pointer-events-none pb-10">
+                    <button onclick="event.stopPropagation(); goToMenu('section-timeline')"
+                        class="bg-pink-400 hover:bg-pink-500 text-white py-3 px-10 rounded-full shadow-lg transition transform hover:-translate-y-1 font-semibold text-lg">
+                        🎉 ยินดีด้วยผ่านด่านนี้แล้ว (กลับหน้าหลัก)
+                    </button>
+                </div>
+            `;
+            container.appendChild(section);
+        }
+
+        // ===== Level 3: Charging Heart =====
+        function buildChargingLevel(container) {
+            const data = projectData.levelData?.charging || {};
+            const completeMsg = data.completeMessage || 'หัวใจเต็มเปี่ยม! 💖💖💖';
+
+            const section = document.createElement('section');
+            section.id = 'section-loading';
+            section.className = 'fixed inset-0 z-50 bg-[#fcf9f5] flex flex-col items-center justify-center section-hidden select-none';
+            section.innerHTML = `
+                <button onclick="goToMenu('section-loading')" class="absolute top-4 left-4 bg-white/50 backdrop-blur px-4 py-2 rounded-full text-pink-500 font-semibold shadow z-50 hover:bg-pink-50 transition border border-pink-100">&larr; กลับหน้าหลัก</button>
+                <h2 class="text-2xl md:text-3xl font-bold text-pink-400 mb-8 animate-pulse text-center" id="charge-text">กดค้างเพื่อชาร์จพลังรัก 💖</h2>
+                <div class="relative w-40 h-40 cursor-pointer transform hover:scale-105 active:scale-95 transition-transform"
+                     onmousedown="startCharge(event)" onmouseup="stopCharge(event)" onmouseleave="stopCharge(event)"
+                     ontouchstart="startCharge(event)" ontouchend="stopCharge(event)" ontouchcancel="stopCharge(event)">
+                    <svg class="absolute inset-0 w-full h-full text-pink-200" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                    </svg>
+                    <svg id="filled-heart" class="absolute inset-0 w-full h-full text-pink-500 drop-shadow-[0_0_15px_rgba(244,114,182,0.8)]" style="clip-path: inset(100% 0 0 0); transition: clip-path 0.05s linear;" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                    </svg>
+                </div>
+            `;
+            section.dataset.completeMessage = completeMsg;
+            container.appendChild(section);
+        }
+
+        // ===== Level 4: Universe =====
+        function buildUniverseLevel(container) {
+            const data = projectData.levelData?.universe || {};
+            const images = data.images || [];
+            const message = data.message || '';
+
+            // Split images into two reels
+            const half = Math.ceil(images.length / 2);
+            const reel1Images = images.slice(0, half);
+            const reel2Images = images.slice(half);
+
+            // If less images, use placeholders
+            const buildReel = (imgs) => {
+                if (imgs.length === 0) {
+                    imgs = ['https://placehold.co/400x300/cbd5e1/475569?text=Memory'];
+                }
+                const cards = imgs.map((url, i) => {
+                    const rot = [1, -1, 2, -2, 1][i % 5];
+                    return `<div class="w-64 h-40 md:w-80 md:h-52 bg-white p-2 md:p-3 pb-6 md:pb-8 rounded shadow-2xl flex-shrink-0" style="transform:rotate(${rot}deg)">
+                        <img src="${url}" class="w-full h-full object-cover rounded-sm" loading="lazy">
+                    </div>`;
+                }).join('');
+                return cards;
+            };
+
+            const reel1HTML = buildReel(reel1Images);
+            const reel2HTML = buildReel(reel2Images.length > 0 ? reel2Images : reel1Images);
+
+            // Build message paragraphs
+            const messageParagraphs = message.split('\n').filter(p => p.trim()).map(p => `<p>${escapeHtml(p)}</p>`).join('');
+
+            const section = document.createElement('section');
+            section.id = 'section-universe';
+            section.className = 'fixed inset-0 z-50 overflow-hidden section-hidden';
+            section.style.cssText = 'background: radial-gradient(circle at center, #31105c, #0f0518); color: white;';
+            section.innerHTML = `
+                <button onclick="goToMenu('section-universe')" class="absolute top-4 left-4 bg-black/30 backdrop-blur px-4 py-2 rounded-full text-pink-300 font-semibold shadow z-50 hover:bg-black/50 transition border border-purple-500">&larr; กลับหน้าหลัก</button>
+                <div class="h-screen flex flex-col justify-between py-10 relative">
+                    <!-- Stars/Hearts Background -->
+                    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+                        <div class="absolute top-[10%] left-[10%] text-pink-400 opacity-60 animate-pulse text-2xl">❤️</div>
+                        <div class="absolute top-[20%] right-[15%] text-pink-300 opacity-50 animate-pulse text-4xl" style="animation-delay: 1s;">💖</div>
+                        <div class="absolute bottom-[25%] left-[20%] text-pink-500 opacity-70 animate-pulse text-xl" style="animation-delay: 2s;">💕</div>
+                        <div class="absolute top-[40%] right-[30%] text-pink-200 opacity-40 animate-pulse text-3xl" style="animation-delay: 1.5s;">💘</div>
+                        <div class="absolute bottom-[10%] right-[15%] text-pink-400 opacity-60 animate-pulse text-2xl" style="animation-delay: 0.5s;">❤️</div>
+                        <div class="absolute top-[60%] left-[5%] text-purple-400 opacity-50 animate-pulse text-3xl" style="animation-delay: 0.8s;">✨</div>
+                        <div class="absolute top-[80%] left-[40%] text-pink-300 opacity-40 animate-pulse text-2xl" style="animation-delay: 1.2s;">🌟</div>
+                    </div>
+
+                    <h2 class="text-3xl md:text-5xl font-bold text-pink-300 z-10 text-center drop-shadow-[0_0_15px_rgba(244,114,182,0.8)] px-4">Our Cinematic Memories 🎞️</h2>
+
+                    <div class="relative w-full z-10 flex flex-col gap-6 md:gap-10 my-auto py-8">
+                        <!-- Reel 1 -->
+                        <div class="flex whitespace-nowrap animate-scroll-left">
+                            <div class="flex gap-4 px-2">${reel1HTML}</div>
+                            <div class="flex gap-4 px-2">${reel1HTML}</div>
+                        </div>
+                        <!-- Reel 2 -->
+                        <div class="flex whitespace-nowrap animate-scroll-right">
+                            <div class="flex gap-4 px-2">${reel2HTML}</div>
+                            <div class="flex gap-4 px-2">${reel2HTML}</div>
+                        </div>
+                    </div>
+
+                    ${message ? `
+                    <div class="mx-4 md:mx-auto max-w-2xl text-white leading-relaxed text-sm md:text-base text-center z-10 bg-black bg-opacity-40 p-4 md:p-6 rounded-3xl backdrop-blur-md border border-purple-500 shadow-[0_0_30px_rgba(168,85,247,0.3)] mb-4">
+                        ${messageParagraphs}
+                    </div>` : ''}
+                </div>
+            `;
+            container.appendChild(section);
+        }
+
+        // ===== Level 5: Letter =====
+        function buildLetterLevel(container) {
+            const data = projectData.levelData?.letter || {};
+            const message = data.message || 'ขอบคุณที่เข้ามาเป็นความน่ารักในชีวิตเค้านะ 💕';
+
+            const section = document.createElement('section');
+            section.id = 'section-letter';
+            section.className = 'w-full max-w-md mx-auto p-6 flex flex-col items-center justify-center text-center section-hidden relative min-h-screen';
+            section.innerHTML = `
+                <button onclick="goToMenu('section-letter')" class="absolute top-4 left-4 bg-white/50 backdrop-blur px-4 py-2 rounded-full text-pink-500 font-semibold shadow z-50 hover:bg-pink-50 transition border border-pink-100">&larr; กลับหน้าหลัก</button>
+                <h2 class="text-3xl font-bold text-pink-500 mb-16 drop-shadow-sm">A Letter For You 💌</h2>
+                <div class="envelope-wrapper" onclick="toggleLetter()">
+                    <div class="envelope" id="love-envelope">
+                        <div class="letter">
+                            <p class="text-pink-600 font-medium text-lg leading-relaxed mb-4">${escapeHtml(message)}</p>
+                            <button onclick="event.stopPropagation(); goToMenu('section-letter')" class="bg-pink-100 text-pink-500 py-2 px-4 rounded-full text-sm font-bold hover:bg-pink-200 transition">เก็บจดหมาย</button>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-400 mt-20 animate-pulse text-sm">👆 กดที่ซองจดหมายเพื่อเปิดอ่าน</p>
+            `;
+            container.appendChild(section);
+        }
+
+        // ===== Level 6: Question =====
+        function buildQuestionLevel(container) {
+            const data = projectData.levelData?.question || {};
+            const questionText = data.question || 'รักเค้าไหมคะ?';
+            const yesText = data.yesText || 'รักสิ! 💖';
+            const successMessage = data.successMessage || 'เย้! รักเหมือนกันนน 💖';
+
+            const section = document.createElement('section');
+            section.id = 'section-question';
+            section.className = 'w-full max-w-md mx-auto p-6 flex flex-col items-center justify-center text-center section-hidden relative min-h-screen overflow-hidden';
+            section.innerHTML = `
+                <button onclick="goToMenu('section-question')" class="absolute top-4 left-4 bg-white/50 backdrop-blur px-4 py-2 rounded-full text-pink-500 font-semibold shadow z-50 hover:bg-pink-50 transition border border-pink-100 z-50">&larr; กลับหน้าหลัก</button>
+                <div class="retro-window relative z-40">
+                    <div class="retro-header">
+                        <span>LOVE.exe</span>
+                        <span>✖</span>
+                    </div>
+                    <div class="retro-body bg-pink-50 relative py-8 flex flex-col items-center justify-center">
+                        <div class="text-5xl mb-4 animate-bounce">🥺❤️</div>
+                        <h3 class="text-2xl font-bold text-pink-600 mb-8">${escapeHtml(questionText)}</h3>
+                        <div class="w-full flex justify-center gap-4 relative">
+                            <button id="btn-yes" onclick="answerYes()" class="retro-btn">${escapeHtml(yesText)}</button>
+                            <button id="btn-no" onmouseover="moveNoBtn()" onclick="moveNoBtn()" class="retro-btn">ไม่รัก 😝</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="question-success" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+                    <div class="text-7xl mb-4 animate-heartbeat">🥰</div>
+                    <h2 class="text-3xl font-bold text-pink-500 mb-4 drop-shadow-sm">${escapeHtml(successMessage)}</h2>
+                </div>
+            `;
+            container.appendChild(section);
+        }
+
+        // =============================================
+        //  NAVIGATION LOGIC
+        // =============================================
+        function startLevel(levelId) {
+            // Reset level state before showing
+            if (levelId === 'section-timeline') {
+                currentMemoryIndex = 0;
+                document.querySelectorAll('.memory-row').forEach(el => {
+                    el.classList.remove('story-visible');
+                    el.classList.add('story-hidden');
+                });
+                const nextBtn = document.getElementById('timeline-next-btn');
+                if (nextBtn) {
+                    nextBtn.classList.add('opacity-0', 'pointer-events-none');
+                    nextBtn.classList.remove('opacity-100');
+                }
+                const timelineSection = document.getElementById('section-timeline');
+                if (timelineSection) timelineSection.style.cursor = 'pointer';
+            } else if (levelId === 'section-password') {
+                wrongAttempts = 0;
+                const errorMsg = document.getElementById('error-msg');
+                if (errorMsg) {
+                    errorMsg.classList.add('hidden');
+                    errorMsg.classList.remove('text-green-500');
+                    errorMsg.classList.add('text-red-500');
+                    errorMsg.innerText = "รหัสผิดน้าา ลองใหม่ๆ 🥺";
+                }
+                const hintEl = document.getElementById('auto-hint');
+                if (hintEl) hintEl.classList.add('hidden');
+                document.querySelectorAll('.pass-input').forEach(el => el.value = '');
+            } else if (levelId === 'section-loading') {
+                chargeAmount = 0;
+                hasCharged = false;
+                if (typeof chargeInterval !== 'undefined' && chargeInterval) { clearInterval(chargeInterval); chargeInterval = null; }
+                if (typeof drainInterval !== 'undefined' && drainInterval) { clearInterval(drainInterval); drainInterval = null; }
+                const filledHeart = document.getElementById('filled-heart');
+                if (filledHeart) filledHeart.style.clipPath = `inset(100% 0 0 0)`;
+                const chargeText = document.getElementById('charge-text');
+                if (chargeText) chargeText.innerText = "กดค้างเพื่อชาร์จพลังรัก 💖";
+            } else if (levelId === 'section-letter') {
+                const envelope = document.getElementById('love-envelope');
+                if (envelope) envelope.classList.remove('open');
+            } else if (levelId === 'section-question') {
+                const btnNo = document.getElementById('btn-no');
+                if (btnNo) {
+                    btnNo.style.position = 'static';
+                    btnNo.style.transform = 'none';
+                }
+                const successEl = document.getElementById('question-success');
+                if (successEl) successEl.classList.add('hidden');
+            }
+
+            nextSection('section-menu', levelId);
+        }
+
+        function goToMenu(currentId) {
+            nextSection(currentId, 'section-menu');
+        }
+
+        function nextSection(currentId, nextId) {
+            const current = document.getElementById(currentId);
+            const next = document.getElementById(nextId);
+            if (!current || !next) return;
+
+            current.classList.add('fade-out');
+
+            setTimeout(() => {
+                current.classList.add('section-hidden');
+                current.classList.remove('fade-out');
+
+                next.classList.remove('section-hidden');
+                next.classList.add('fade-in');
+
+                if (nextId === 'section-password') {
+                    const p1 = document.getElementById('p1');
+                    if (p1) p1.focus();
+                }
+
+                if (nextId === 'section-universe') {
+                    shootConfetti();
+                }
+            }, 500);
+        }
+
+        // =============================================
+        //  HOLD TO CHARGE LOGIC
+        // =============================================
+        let chargeInterval = null;
+        let drainInterval = null;
+        let chargeAmount = 0;
+        let hasCharged = false;
+
+        function startCharge(e) {
+            e.preventDefault();
+            if (hasCharged) return;
+
+            if (drainInterval) {
+                clearInterval(drainInterval);
+                drainInterval = null;
+            }
+
+            document.getElementById('charge-text').innerText = "ชาร์จพลังรัก... 💖";
+
+            chargeInterval = setInterval(() => {
+                chargeAmount += 1.5;
+                if (chargeAmount >= 100) chargeAmount = 100;
+
+                document.getElementById('filled-heart').style.clipPath = `inset(${100 - chargeAmount}% 0 0 0)`;
+
+                if (chargeAmount >= 100) {
+                    clearInterval(chargeInterval);
+                    chargeInterval = null;
+                    hasCharged = true;
+
+                    // Use custom complete message
+                    const loadingSection = document.getElementById('section-loading');
+                    const completeMsg = loadingSection?.dataset?.completeMessage || 'หัวใจเต็มเปี่ยม! 💖💖💖';
+                    document.getElementById('charge-text').innerText = completeMsg;
+
+                    setTimeout(() => {
+                        goToMenu('section-loading');
+                    }, 1500);
+                }
+            }, 20);
+        }
+
+        function stopCharge(e) {
+            e.preventDefault();
+            if (hasCharged) return;
+
+            if (chargeInterval) {
+                clearInterval(chargeInterval);
+                chargeInterval = null;
+            }
+
+            drainInterval = setInterval(() => {
+                chargeAmount -= 3;
+                if (chargeAmount <= 0) {
+                    chargeAmount = 0;
+                    clearInterval(drainInterval);
+                    drainInterval = null;
+                    document.getElementById('charge-text').innerText = "กดค้างเพื่อชาร์จพลังรัก 💖";
+                }
+                document.getElementById('filled-heart').style.clipPath = `inset(${100 - chargeAmount}% 0 0 0)`;
+            }, 20);
+        }
+
+        // =============================================
+        //  PASSWORD LOGIC
+        // =============================================
+        let wrongAttempts = 0;
+
+        function moveToNext(currentInput, event) {
+            const errorMsg = document.getElementById('error-msg');
+            if (errorMsg) errorMsg.classList.add('hidden');
+
+            if (currentInput.value.length >= 1) {
+                let nextInput = currentInput.nextElementSibling;
+                if (nextInput && nextInput.tagName.toLowerCase() === "input") {
+                    nextInput.focus();
+                }
+            }
+
+            if (event.key === "Backspace") {
+                let prevInput = currentInput.previousElementSibling;
+                if (prevInput && prevInput.tagName.toLowerCase() === "input") {
+                    prevInput.focus();
+                }
+            }
+        }
+
+        function checkPassword() {
+            let enteredPass = "";
+            for (let i = 1; i <= 6; i++) {
+                const el = document.getElementById('p' + i);
+                if (el) enteredPass += el.value;
+            }
+
+            if (enteredPass.length === 6) {
+                const correctPassword = projectData?.levelData?.password?.code || '000000';
+
+                if (enteredPass === correctPassword) {
+                    document.getElementById('error-msg').classList.remove('hidden');
+                    document.getElementById('error-msg').classList.remove('text-red-500');
+                    document.getElementById('error-msg').classList.add('text-green-500');
+                    document.getElementById('error-msg').innerText = "รหัสถูกต้อง! เก่งมากกก 🎉";
+
+                    setTimeout(() => {
+                        goToMenu('section-password');
+                    }, 1500);
+                } else {
+                    wrongAttempts++;
+                    document.getElementById('error-msg').classList.remove('hidden');
+
+                    if (wrongAttempts >= 2) {
+                        const hintEl = document.getElementById('auto-hint');
+                        if (hintEl) hintEl.classList.remove('hidden');
+                    }
+
+                    const inputs = document.querySelectorAll('.pass-input');
+                    inputs.forEach(input => {
+                        input.style.transform = "translateX(-5px)";
+                        setTimeout(() => input.style.transform = "translateX(5px)", 50);
+                        setTimeout(() => input.style.transform = "translateX(-5px)", 100);
+                        setTimeout(() => input.style.transform = "translateX(5px)", 150);
+                        setTimeout(() => input.style.transform = "translateX(0)", 200);
+                        input.value = "";
+                    });
+                    document.getElementById('p1').focus();
+                }
+            }
+        }
+
+        // =============================================
+        //  TIMELINE LOGIC
+        // =============================================
+        let currentMemoryIndex = 0;
+
+        function revealNextMemory() {
+            const memories = document.querySelectorAll('.memory-row');
+            if (currentMemoryIndex < memories.length) {
+                memories[currentMemoryIndex].classList.remove('story-hidden');
+                memories[currentMemoryIndex].classList.add('story-visible');
+
+                if (currentMemoryIndex > 0) {
+                    setTimeout(() => {
+                        memories[currentMemoryIndex - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                }
+
+                currentMemoryIndex++;
+            }
+
+            if (currentMemoryIndex === memories.length) {
+                const nextBtn = document.getElementById('timeline-next-btn');
+                if (nextBtn) {
+                    nextBtn.classList.remove('opacity-0', 'pointer-events-none');
+                    nextBtn.classList.add('opacity-100');
+                }
+                const timelineSection = document.getElementById('section-timeline');
+                if (timelineSection) timelineSection.style.cursor = 'default';
+            }
+        }
+
+        // =============================================
+        //  CONFETTI LOGIC
+        // =============================================
+        function shootConfetti() {
+            const colors = ['#f472b6', '#fb7185', '#e879f9', '#38bdf8', '#facc15'];
+            for (let i = 0; i < 50; i++) {
+                createConfetti(colors);
+            }
+        }
+
+        function createConfetti(colors) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 4000);
+        }
+
+        // =============================================
+        //  LETTER LOGIC
+        // =============================================
+        function toggleLetter() {
+            const envelope = document.getElementById('love-envelope');
+            if (envelope) envelope.classList.toggle('open');
+        }
+
+        // =============================================
+        //  QUESTION LOGIC
+        // =============================================
+        function moveNoBtn() {
+            const btn = document.getElementById('btn-no');
+            if (!btn) return;
+            btn.style.position = 'fixed';
+            const randomX = Math.floor(Math.random() * 60) + 20;
+            const randomY = Math.floor(Math.random() * 60) + 20;
+            btn.style.left = randomX + 'vw';
+            btn.style.top = randomY + 'vh';
+        }
+
+        function answerYes() {
+            const successEl = document.getElementById('question-success');
+            if (successEl) successEl.classList.remove('hidden');
+            shootConfetti();
+            setTimeout(() => {
+                if (successEl) successEl.classList.add('hidden');
+                goToMenu('section-question');
+            }, 3000);
+        }
+
+        // =============================================
+        //  UTILITY
+        // =============================================
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // =============================================
+        //  START
+        // =============================================
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

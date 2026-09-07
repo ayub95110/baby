@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise Creator - Admin Panel 🎉</title>
+    <meta name="description" content="สร้าง Surprise สุดพิเศษให้คนที่คุณรัก">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0c0015 0%, #1a0533 40%, #0d0021 100%);
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        ::-webkit-scrollbar-thumb { background: rgba(244,114,182,0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(244,114,182,0.5); }
+
+        /* ===== Header ===== */
+        .admin-header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(12, 0, 21, 0.8);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f472b6, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f472b6, #c084fc);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            -webkit-text-fill-color: white;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* ===== Buttons ===== */
+        .btn {
+            padding: 0.65rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 114, 182, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(244, 114, 182, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #94a3b8;
+            padding: 0.5rem 1rem;
+        }
+
+        .btn-ghost:hover {
+            color: #f472b6;
+            background: rgba(244, 114, 182, 0.05);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ===== Container ===== */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* ===== Glass Card ===== */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ===== Progress Steps ===== */
+        .progress-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 2.5rem;
+            padding: 0 1rem;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 100px;
+            cursor: default;
+            transition: all 0.4s;
+            white-space: nowrap;
+        }
+
+        .progress-step .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.08);
+            color: #64748b;
+            transition: all 0.4s;
+            flex-shrink: 0;
+        }
+
+        .progress-step .step-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.4s;
+        }
+
+        .progress-step.active .step-number {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: white;
+            box-shadow: 0 0 20px rgba(244, 114, 182, 0.4);
+        }
+
+        .progress-step.active .step-label {
+            color: #f1f5f9;
+        }
+
+        .progress-step.completed .step-number {
+            background: #22c55e;
+            color: white;
+        }
+
+        .progress-step.completed .step-label {
+            color: #86efac;
+        }
+
+        .progress-line {
+            width: 60px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.08);
+            transition: background 0.4s;
+            flex-shrink: 0;
+        }
+
+        .progress-line.active {
+            background: linear-gradient(90deg, #22c55e, #f472b6);
+        }
+
+        /* ===== Step Content ===== */
+        .step-content {
+            display: none;
+            animation: fadeSlideIn 0.5s ease forwards;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== Section Title ===== */
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #f8fafc, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        /* ===== Level Cards (Step 1) ===== */
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .level-select-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-select-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(244,114,182,0.08), rgba(168,85,247,0.08));
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 18px;
+        }
+
+        .level-select-card:hover {
+            border-color: rgba(244, 114, 182, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .level-select-card:hover::before {
+            opacity: 1;
+        }
+
+        .level-select-card.selected {
+            border-color: #f472b6;
+            background: rgba(244, 114, 182, 0.08);
+        }
+
+        .level-select-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .level-select-card .level-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .level-select-card .level-name {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .level-select-card .level-desc {
+            color: #64748b;
+            font-size: 0.8rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== Form Inputs ===== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #f1f5f9;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: #f472b6;
+            box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.1);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: #475569;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* ===== Level Config Tabs (Step 2) ===== */
+        .level-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            scrollbar-width: none;
+        }
+
+        .level-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .level-tab {
+            padding: 0.6rem 1.25rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #64748b;
+        }
+
+        .level-tab:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #e2e8f0;
+        }
+
+        .level-tab.active {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(244, 114, 182, 0.3);
+        }
+
+        .level-tab .tab-check {
+            display: inline-block;
+            margin-left: 0.35rem;
+            color: #86efac;
+        }
+
+        .level-config {
+            display: none;
+            animation: fadeSlideIn 0.4s ease forwards;
+        }
+
+        .level-config.active {
+            display: block;
+        }
+
+        /* ===== Drop Zone ===== */
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: #f472b6;
+            background: rgba(244, 114, 182, 0.04);
+        }
+
+        .drop-zone-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .drop-zone-text {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+        }
+
+        .drop-zone-hint {
+            font-size: 0.75rem;
+            color: #475569;
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* ===== Image Preview Grid ===== */
+        .image-previews {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .image-preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview-item .remove-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 24px;
+            height: 24px;
+            background: rgba(239, 68, 68, 0.9);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .image-preview-item:hover .remove-btn {
+            opacity: 1;
+        }
+
+        /* ===== Memory Items (Timeline Config) ===== */
+        .memory-config-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .memory-config-item:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .memory-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .memory-number {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #f472b6;
+        }
+
+        .memory-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .memory-fields .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .memory-image-area {
+            margin-top: 0.75rem;
+        }
+
+        .memory-image-area .drop-zone {
+            padding: 1.25rem;
+        }
+
+        .memory-image-preview {
+            margin-top: 0.5rem;
+            max-width: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .memory-image-preview img {
+            width: 100%;
+            display: block;
+        }
+
+        /* ===== Step 3: Publish ===== */
+        .publish-summary {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .summary-item .summary-emoji {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .summary-item .summary-text h4 {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .summary-item .summary-text p {
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        .summary-item .summary-check {
+            margin-left: auto;
+            color: #22c55e;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .summary-item .summary-warning {
+            margin-left: auto;
+            color: #f59e0b;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        /* ===== Share Link Box ===== */
+        .share-box {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            display: none;
+            animation: fadeSlideIn 0.5s ease forwards;
+        }
+
+        .share-box.visible {
+            display: block;
+        }
+
+        .share-box h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #86efac;
+            margin-bottom: 0.5rem;
+        }
+
+        .share-box p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .share-link-input {
+            display: flex;
+            gap: 0.5rem;
+            max-width: 500px;
+            margin: 0 auto 1rem;
+        }
+
+        .share-link-input input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            color: #86efac;
+            font-family: 'Mali', monospace;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        /* ===== Footer Actions ===== */
+        .step-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* ===== Loading Overlay ===== */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(12, 0, 21, 0.9);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .loading-overlay.visible {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(244, 114, 182, 0.2);
+            border-top-color: #f472b6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            color: #f472b6;
+            font-weight: 600;
+        }
+
+        .loading-progress {
+            width: 300px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #f472b6, #a855f7);
+            border-radius: 3px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        /* ===== Dashboard View ===== */
+        .dashboard {
+            animation: fadeSlideIn 0.5s ease forwards;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .project-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s;
+        }
+
+        .project-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .project-card .project-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(244,114,182,0.15), rgba(168,85,247,0.15));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .project-card .project-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .project-card .project-name {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.15rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .project-card .project-meta {
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        .project-card .project-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #475569;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ===== Toast Notification ===== */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 0.75rem 1.5rem;
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 2000;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .glass-card {
+                padding: 1.25rem;
+                border-radius: 18px;
+            }
+
+            .levels-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .memory-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-step .step-label {
+                display: none;
+            }
+
+            .section-title {
+                font-size: 1.35rem;
+            }
+
+            .step-actions {
+                flex-direction: column-reverse;
+                gap: 0.75rem;
+            }
+
+            .step-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .share-link-input {
+                flex-direction: column;
+            }
+
+            .project-card {
+                flex-wrap: wrap;
+            }
+
+            .project-card .project-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="logo">
+            <div class="logo-icon">🎉</div>
+            Surprise Creator
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-ghost" onclick="showDashboard()" id="btn-dashboard">📋 โปรเจคของฉัน</button>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- ============================== -->
+        <!-- Dashboard View                 -->
+        <!-- ============================== -->
+        <div id="view-dashboard" class="dashboard">
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="section-title">โปรเจคของฉัน</h1>
+                    <p class="section-subtitle">จัดการโปรเจค Surprise ทั้งหมดของคุณ</p>
+                </div>
+                <button class="btn btn-primary" onclick="startNewProject()">✨ สร้างใหม่</button>
+            </div>
+
+            <div id="project-list" class="project-list">
+                <div class="empty-state">
+                    <div class="empty-icon">🎁</div>
+                    <h3>ยังไม่มีโปรเจค</h3>
+                    <p>สร้าง Surprise แรกของคุณเลย!</p>
+                    <button class="btn btn-primary" onclick="startNewProject()">✨ สร้างโปรเจคใหม่</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- Wizard View                    -->
+        <!-- ============================== -->
+        <div id="view-wizard" style="display: none;">
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-step active" id="prog-step-1">
+                    <span class="step-number">1</span>
+                    <span class="step-label">สร้างโปรเจค</span>
+                </div>
+                <div class="progress-line" id="prog-line-1"></div>
+                <div class="progress-step" id="prog-step-2">
+                    <span class="step-number">2</span>
+                    <span class="step-label">ตั้งค่าด่าน</span>
+                </div>
+                <div class="progress-line" id="prog-line-2"></div>
+                <div class="progress-step" id="prog-step-3">
+                    <span class="step-number">3</span>
+                    <span class="step-label">เผยแพร่</span>
+                </div>
+            </div>
+
+            <!-- ===== STEP 1: Create Project ===== -->
+            <div id="step-1" class="step-content active">
+                <div class="glass-card">
+                    <h2 class="section-title">สร้าง Surprise ใหม่ ✨</h2>
+                    <p class="section-subtitle">ตั้งชื่อและเลือกด่านที่ต้องการ</p>
+
+                    <div class="form-group">
+                        <label class="form-label">ชื่อโปรเจค</label>
+                        <input type="text" class="form-input" id="input-project-name" placeholder="เช่น Surprise for คุณหมี 🐻">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">เลือกด่านที่ต้องการ (เลือกได้หลายด่าน)</label>
+                        <div class="levels-grid" id="level-selector">
+                            <div class="level-select-card" data-level="1" onclick="toggleLevel(this)">
+                                <span class="level-emoji">🔐</span>
+                                <div class="level-name">ด่าน 1: รหัสลับ</div>
+                                <div class="level-desc">ทายรหัสผ่านเพื่อปลดล็อค</div>
+                            </div>
+                            <div class="level-select-card" data-level="2" onclick="toggleLevel(this)">
+                                <span class="level-emoji">📸</span>
+                                <div class="level-name">ด่าน 2: ความทรงจำ</div>
+                                <div class="level-desc">Timeline ภาพความทรงจำ</div>
+                            </div>
+                            <div class="level-select-card" data-level="3" onclick="toggleLevel(this)">
+                                <span class="level-emoji">🔋</span>
+                                <div class="level-name">ด่าน 3: ชาร์จพลังรัก</div>
+                                <div class="level-desc">กดค้างเพื่อเติมหัวใจ</div>
+                            </div>
+                            <div class="level-select-card" data-level="4" onclick="toggleLevel(this)">
+                                <span class="level-emoji">🌌</span>
+                                <div class="level-name">ด่าน 4: จักรวาลของเรา</div>
+                                <div class="level-desc">ภาพยนตร์ความรักแบบ Cinematic</div>
+                            </div>
+                            <div class="level-select-card" data-level="5" onclick="toggleLevel(this)">
+                                <span class="level-emoji">💌</span>
+                                <div class="level-name">ด่าน 5: จดหมายรัก</div>
+                                <div class="level-desc">เปิดซองจดหมายอ่านข้อความ</div>
+                            </div>
+                            <div class="level-select-card" data-level="6" onclick="toggleLevel(this)">
+                                <span class="level-emoji">🎮</span>
+                                <div class="level-name">ด่าน 6: คำถามสำคัญ</div>
+                                <div class="level-desc">รักเค้าไหม? ปุ่มหนีไม่ได้!</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <button class="btn btn-ghost" onclick="showDashboard()">← ยกเลิก</button>
+                        <button class="btn btn-primary" onclick="goToStep2()">ถัดไป →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== STEP 2: Configure Levels ===== -->
+            <div id="step-2" class="step-content">
+                <div class="glass-card">
+                    <h2 class="section-title">ตั้งค่าแต่ละด่าน 🎯</h2>
+                    <p class="section-subtitle">กรอกข้อมูลและอัพโหลดรูปสำหรับแต่ละด่าน</p>
+
+                    <!-- Dynamic Tabs -->
+                    <div class="level-tabs" id="config-tabs"></div>
+
+                    <!-- Dynamic Config Forms -->
+                    <div id="config-forms"></div>
+
+                    <div class="step-actions">
+                        <button class="btn btn-secondary" onclick="goToStep(1)">← ก่อนหน้า</button>
+                        <button class="btn btn-primary" onclick="goToStep3()">ถัดไป →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== STEP 3: Publish ===== -->
+            <div id="step-3" class="step-content">
+                <div class="glass-card">
+                    <h2 class="section-title">พร้อมเผยแพร่! 🚀</h2>
+                    <p class="section-subtitle">ตรวจสอบข้อมูลและกด Publish</p>
+
+                    <div class="publish-summary" id="publish-summary"></div>
+
+                    <div id="publish-actions" style="text-align: center; margin-bottom: 2rem;">
+                        <button class="btn btn-primary" onclick="publishProject()" id="btn-publish" style="font-size: 1.1rem; padding: 0.85rem 3rem;">
+                            🚀 เผยแพร่ Surprise!
+                        </button>
+                    </div>
+
+                    <!-- Share Link Box (hidden until published) -->
+                    <div class="share-box" id="share-box">
+                        <h3>🎉 เผยแพร่สำเร็จ!</h3>
+                        <p>คัดลอกลิงค์นี้ส่งให้คนพิเศษของคุณ</p>
+                        <div class="share-link-input">
+                            <input type="text" id="share-link-url" readonly>
+                            <button class="btn btn-primary" onclick="copyShareLink()">📋 คัดลอก</button>
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <button class="btn btn-secondary" onclick="goToStep(2)">← แก้ไข</button>
+                        <button class="btn btn-ghost" onclick="showDashboard()">กลับหน้าหลัก</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loading-text">กำลังอัพโหลด...</div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar" id="loading-progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Firebase Config -->
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        // =============================================
+        //  STATE
+        // =============================================
+        let currentStep = 1;
+        let projectId = null;
+        let selectedLevels = [];
+        let levelConfigs = {}; // { levelNum: { ...data, files: [] } }
+
+        const LEVEL_DEFS = {
+            1: { emoji: '🔐', name: 'รหัสลับ', section: 'section-password' },
+            2: { emoji: '📸', name: 'ความทรงจำ', section: 'section-timeline' },
+            3: { emoji: '🔋', name: 'ชาร์จพลังรัก', section: 'section-loading' },
+            4: { emoji: '🌌', name: 'จักรวาลของเรา', section: 'section-universe' },
+            5: { emoji: '💌', name: 'จดหมายรัก', section: 'section-letter' },
+            6: { emoji: '🎮', name: 'คำถามสำคัญ', section: 'section-question' }
+        };
+
+        // =============================================
+        //  DASHBOARD
+        // =============================================
+        function showDashboard() {
+            document.getElementById('view-dashboard').style.display = 'block';
+            document.getElementById('view-wizard').style.display = 'none';
+            loadProjects();
+        }
+
+        function loadProjects() {
+            const projectIds = JSON.parse(localStorage.getItem('surprise_projects') || '[]');
+            const listEl = document.getElementById('project-list');
+
+            if (projectIds.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🎁</div>
+                        <h3>ยังไม่มีโปรเจค</h3>
+                        <p>สร้าง Surprise แรกของคุณเลย!</p>
+                        <button class="btn btn-primary" onclick="startNewProject()">✨ สร้างโปรเจคใหม่</button>
+                    </div>`;
+                return;
+            }
+
+            listEl.innerHTML = '<div style="text-align:center; color:#64748b; padding:2rem;">กำลังโหลด...</div>';
+
+            // Load each project from Firestore
+            Promise.all(projectIds.map(id =>
+                db.collection('projects').doc(id).get()
+                    .then(doc => doc.exists ? { id: doc.id, ...doc.data() } : null)
+                    .catch(() => null)
+            )).then(projects => {
+                const validProjects = projects.filter(p => p !== null);
+
+                if (validProjects.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🎁</div>
+                            <h3>ยังไม่มีโปรเจค</h3>
+                            <p>สร้าง Surprise แรกของคุณเลย!</p>
+                            <button class="btn btn-primary" onclick="startNewProject()">✨ สร้างโปรเจคใหม่</button>
+                        </div>`;
+                    return;
+                }
+
+                listEl.innerHTML = validProjects.map(p => {
+                    const date = p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleDateString('th-TH') : '-';
+                    const levelEmojis = (p.levels || []).map(l => LEVEL_DEFS[l]?.emoji || '').join(' ');
+                    const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
+                    const shareUrl = baseUrl + '?id=' + p.id;
+
+                    return `
+                    <div class="project-card">
+                        <div class="project-icon">🎁</div>
+                        <div class="project-info">
+                            <div class="project-name">${escapeHtml(p.name || 'Untitled')}</div>
+                            <div class="project-meta">${levelEmojis} · สร้างเมื่อ ${date}</div>
+                        </div>
+                        <div class="project-actions">
+                            <button class="btn btn-secondary" onclick="copyLink('${shareUrl}')" title="คัดลอกลิงค์">📋 ลิงค์</button>
+                            <button class="btn btn-danger" onclick="deleteProject('${p.id}')" title="ลบ">🗑️</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        async function deleteProject(id) {
+            if (!confirm('ต้องการลบโปรเจคนี้ใช่ไหม?')) return;
+
+            try {
+                await db.collection('projects').doc(id).delete();
+                // Remove from localStorage
+                let ids = JSON.parse(localStorage.getItem('surprise_projects') || '[]');
+                ids = ids.filter(pid => pid !== id);
+                localStorage.setItem('surprise_projects', JSON.stringify(ids));
+                showToast('ลบโปรเจคแล้ว');
+                loadProjects();
+            } catch (err) {
+                showToast('เกิดข้อผิดพลาด: ' + err.message, true);
+            }
+        }
+
+        function copyLink(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('คัดลอกลิงค์แล้ว! 📋');
+            });
+        }
+
+        // =============================================
+        //  WIZARD: START NEW PROJECT
+        // =============================================
+        function startNewProject() {
+            // Reset state
+            currentStep = 1;
+            projectId = null;
+            selectedLevels = [];
+            levelConfigs = {};
+
+            // Reset UI
+            document.getElementById('input-project-name').value = '';
+            document.querySelectorAll('.level-select-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('config-tabs').innerHTML = '';
+            document.getElementById('config-forms').innerHTML = '';
+            document.getElementById('share-box').classList.remove('visible');
+            document.getElementById('btn-publish').disabled = false;
+            document.getElementById('publish-actions').style.display = 'block';
+
+            // Show wizard
+            document.getElementById('view-dashboard').style.display = 'none';
+            document.getElementById('view-wizard').style.display = 'block';
+            updateProgressUI();
+            showStepContent(1);
+        }
+
+        // =============================================
+        //  STEP 1: Select Levels
+        // =============================================
+        function toggleLevel(card) {
+            card.classList.toggle('selected');
+        }
+
+        function getSelectedLevels() {
+            const cards = document.querySelectorAll('.level-select-card.selected');
+            return Array.from(cards).map(c => parseInt(c.dataset.level)).sort((a, b) => a - b);
+        }
+
+        function goToStep2() {
+            const name = document.getElementById('input-project-name').value.trim();
+            if (!name) {
+                showToast('กรุณาตั้งชื่อโปรเจค', true);
+                document.getElementById('input-project-name').focus();
+                return;
+            }
+
+            selectedLevels = getSelectedLevels();
+            if (selectedLevels.length === 0) {
+                showToast('กรุณาเลือกอย่างน้อย 1 ด่าน', true);
+                return;
+            }
+
+            // Generate project ID
+            if (!projectId) {
+                projectId = db.collection('projects').doc().id;
+            }
+
+            // Initialize level configs for new levels
+            selectedLevels.forEach(lvl => {
+                if (!levelConfigs[lvl]) {
+                    levelConfigs[lvl] = getDefaultConfig(lvl);
+                }
+            });
+
+            // Build config UI
+            buildConfigTabs();
+            buildConfigForms();
+
+            goToStep(2);
+        }
+
+        function getDefaultConfig(levelNum) {
+            switch (levelNum) {
+                case 1: return { code: '', hint: '' };
+                case 2: return { memories: [{ date: '', title: '', desc: '', file: null, previewUrl: '' }] };
+                case 3: return { completeMessage: 'หัวใจเต็มเปี่ยม! 💖💖💖' };
+                case 4: return { files: [], previewUrls: [], message: '' };
+                case 5: return { message: '' };
+                case 6: return { question: 'รักเค้าไหมคะ?', yesText: 'รักสิ! 💖', successMessage: 'เย้! รักเหมือนกันนน 💖' };
+                default: return {};
+            }
+        }
+
+        // =============================================
+        //  STEP 2: Configure Levels
+        // =============================================
+        function buildConfigTabs() {
+            const tabsEl = document.getElementById('config-tabs');
+            tabsEl.innerHTML = selectedLevels.map((lvl, i) => {
+                const def = LEVEL_DEFS[lvl];
+                return `<div class="level-tab ${i === 0 ? 'active' : ''}" data-level="${lvl}" onclick="switchTab(${lvl})">
+                    ${def.emoji} ${def.name} <span class="tab-check" id="tab-check-${lvl}" style="display:none">✓</span>
+                </div>`;
+            }).join('');
+        }
+
+        function buildConfigForms() {
+            const formsEl = document.getElementById('config-forms');
+            formsEl.innerHTML = selectedLevels.map((lvl, i) => {
+                return `<div class="level-config ${i === 0 ? 'active' : ''}" id="config-${lvl}">
+                    ${getConfigFormHTML(lvl)}
+                </div>`;
+            }).join('');
+
+            // Restore existing data
+            selectedLevels.forEach(lvl => restoreFormData(lvl));
+        }
+
+        function switchTab(levelNum) {
+            // Save current tab data
+            const currentTab = document.querySelector('.level-tab.active');
+            if (currentTab) {
+                saveFormData(parseInt(currentTab.dataset.level));
+            }
+
+            // Switch tabs
+            document.querySelectorAll('.level-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.level-config').forEach(c => c.classList.remove('active'));
+
+            document.querySelector(`.level-tab[data-level="${levelNum}"]`).classList.add('active');
+            document.getElementById(`config-${levelNum}`).classList.add('active');
+        }
+
+        function getConfigFormHTML(levelNum) {
+            switch (levelNum) {
+                case 1:
+                    return `
+                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🔐 ตั้งค่ารหัสลับ</h3>
+                        <div class="form-group">
+                            <label class="form-label">รหัสผ่าน (6 หลัก)</label>
+                            <input type="text" class="form-input" id="cfg-password-code" maxlength="6" placeholder="เช่น 070925" 
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">คำใบ้ (Hint)</label>
+                            <input type="text" class="form-input" id="cfg-password-hint" placeholder="เช่น วันครบรอบของเรา (ววดดปป)">
+                        </div>`;
+
+                case 2:
+                    return `
+                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">📸 ตั้งค่าความทรงจำ</h3>
+                        <div id="memories-container"></div>
+                        <button class="btn btn-secondary" onclick="addMemory()" style="margin-top:0.5rem;">+ เพิ่มความทรงจำ</button>`;
+
+                case 3:
+                    return `
+                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🔋 ตั้งค่าชาร์จพลังรัก</h3>
+                        <div class="form-group">
+                            <label class="form-label">ข้อความเมื่อชาร์จเสร็จ</label>
+                            <input type="text" class="form-input" id="cfg-charge-message" placeholder="หัวใจเต็มเปี่ยม! 💖💖💖">
+                        </div>
+                        <p style="color:#64748b; font-size:0.85rem;">ด่านนี้ผู้เล่นจะกดค้างเพื่อชาร์จหัวใจให้เต็ม ❤️</p>`;
+
+                case 4:
+                    return `
+                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🌌 ตั้งค่าจักรวาลของเรา</h3>
+                        <div class="form-group">
+                            <label class="form-label">อัพโหลดรูป (5-10 รูป)</label>
+                            <div class="drop-zone" id="universe-dropzone"
+                                 ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleUniverseDrop(event)">
+                                <span class="drop-zone-icon">🖼️</span>
+                                <div class="drop-zone-text">ลากรูปมาวาง หรือคลิกเพื่อเลือก</div>
+                                <div class="drop-zone-hint">รองรับ JPG, PNG, WEBP (สูงสุด 5MB/รูป)</div>
+                                <input type="file" accept="image/*" multiple onchange="handleUniverseFiles(this.files)">
+                            </div>
+                            <div class="image-previews" id="universe-previews"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ข้อความ Anniversary</label>
+                            <textarea class="form-textarea" id="cfg-universe-message" placeholder="ขอบคุณที่อยู่เคียงข้างกัน..."></textarea>
+                        </div>`;
+
+                case 5:
+                    return `
+                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">💌 ตั้งค่าจดหมายรัก</h3>
+                        <div class="form-group">
+                            <label class="form-label">ข้อความในจดหมาย</label>
+                            <textarea class="form-textarea" id="cfg-letter-message" placeholder="เขียนจดหมายรักของคุณที่นี่...&#10;เช่น ขอบคุณที่เข้ามาในชีวิตนะ 💕" style="min-height:180px;"></textarea>
+                        </div>`;
+
+                case 6:
+                    return `
+                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🎮 ตั้งค่าคำถามสำคัญ</h3>
+                        <div class="form-group">
+                            <label class="form-label">คำถาม</label>
+                            <input type="text" class="form-input" id="cfg-question-text" placeholder="รักเค้าไหมคะ?">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ข้อความปุ่ม Yes</label>
+                            <input type="text" class="form-input" id="cfg-question-yes" placeholder="รักสิ! 💖">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ข้อความเมื่อตอบ Yes</label>
+                            <input type="text" class="form-input" id="cfg-question-success" placeholder="เย้! รักเหมือนกันนน 💖">
+                        </div>`;
+
+                default:
+                    return '<p>ไม่มีการตั้งค่าสำหรับด่านนี้</p>';
+            }
+        }
+
+        // ===== Memory Management =====
+        function renderMemories() {
+            const container = document.getElementById('memories-container');
+            if (!container) return;
+
+            const config = levelConfigs[2];
+            if (!config) return;
+
+            container.innerHTML = config.memories.map((mem, i) => `
+                <div class="memory-config-item">
+                    <div class="memory-header">
+                        <span class="memory-number">ความทรงจำที่ ${i + 1}</span>
+                        ${config.memories.length > 1 ? `<button class="btn btn-ghost" onclick="removeMemory(${i})" style="color:#f87171; padding:0.25rem 0.5rem;">✕ ลบ</button>` : ''}
+                    </div>
+                    <div class="memory-fields">
+                        <div>
+                            <label class="form-label">วันที่</label>
+                            <input type="text" class="form-input" id="mem-date-${i}" placeholder="เช่น 12 May 2023" value="${escapeHtml(mem.date)}">
+                        </div>
+                        <div>
+                            <label class="form-label">ชื่อ</label>
+                            <input type="text" class="form-input" id="mem-title-${i}" placeholder="เช่น First Date" value="${escapeHtml(mem.title)}">
+                        </div>
+                        <div class="full-width">
+                            <label class="form-label">คำอธิบาย</label>
+                            <input type="text" class="form-input" id="mem-desc-${i}" placeholder="เช่น The day it all started" value="${escapeHtml(mem.desc)}">
+                        </div>
+                    </div>
+                    <div class="memory-image-area">
+                        <label class="form-label">รูปภาพ</label>
+                        ${mem.previewUrl ? `
+                            <div class="memory-image-preview">
+                                <img src="${mem.previewUrl}" alt="Memory ${i + 1}">
+                            </div>
+                            <button class="btn btn-ghost" onclick="removeMemoryImage(${i})" style="color:#f87171; font-size:0.8rem; margin-top:0.25rem;">✕ ลบรูป</button>
+                        ` : `
+                            <div class="drop-zone" style="padding:1.25rem;">
+                                <span class="drop-zone-icon" style="font-size:1.5rem;">📷</span>
+                                <div class="drop-zone-text" style="font-size:0.85rem;">คลิกเพื่อเลือกรูป</div>
+                                <input type="file" accept="image/*" onchange="handleMemoryImage(${i}, this.files[0])">
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addMemory() {
+            if (!levelConfigs[2]) levelConfigs[2] = getDefaultConfig(2);
+            levelConfigs[2].memories.push({ date: '', title: '', desc: '', file: null, previewUrl: '' });
+            // Save existing data before re-render
+            saveMemoryData();
+            renderMemories();
+        }
+
+        function removeMemory(index) {
+            saveMemoryData();
+            levelConfigs[2].memories.splice(index, 1);
+            renderMemories();
+        }
+
+        function saveMemoryData() {
+            const config = levelConfigs[2];
+            if (!config) return;
+
+            config.memories.forEach((mem, i) => {
+                const dateEl = document.getElementById(`mem-date-${i}`);
+                const titleEl = document.getElementById(`mem-title-${i}`);
+                const descEl = document.getElementById(`mem-desc-${i}`);
+                if (dateEl) mem.date = dateEl.value;
+                if (titleEl) mem.title = titleEl.value;
+                if (descEl) mem.desc = descEl.value;
+            });
+        }
+
+        function handleMemoryImage(index, file) {
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('ไฟล์ใหญ่เกิน 5MB', true);
+                return;
+            }
+
+            saveMemoryData();
+            levelConfigs[2].memories[index].file = file;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                levelConfigs[2].memories[index].previewUrl = e.target.result;
+                renderMemories();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeMemoryImage(index) {
+            saveMemoryData();
+            levelConfigs[2].memories[index].file = null;
+            levelConfigs[2].memories[index].previewUrl = '';
+            renderMemories();
+        }
+
+        // ===== Universe Images =====
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleUniverseDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            handleUniverseFiles(e.dataTransfer.files);
+        }
+
+        function handleUniverseFiles(files) {
+            if (!levelConfigs[4]) levelConfigs[4] = getDefaultConfig(4);
+            const config = levelConfigs[4];
+
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast(`${file.name} ใหญ่เกิน 5MB`, true);
+                    return;
+                }
+                if (config.files.length >= 10) {
+                    showToast('อัพโหลดได้สูงสุด 10 รูป', true);
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    config.files.push(file);
+                    config.previewUrls.push(e.target.result);
+                    renderUniversePreviews();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderUniversePreviews() {
+            const config = levelConfigs[4];
+            if (!config) return;
+
+            const container = document.getElementById('universe-previews');
+            if (!container) return;
+
+            container.innerHTML = config.previewUrls.map((url, i) => `
+                <div class="image-preview-item">
+                    <img src="${url}" alt="Universe ${i + 1}">
+                    <button class="remove-btn" onclick="removeUniverseImage(${i})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function removeUniverseImage(index) {
+            const config = levelConfigs[4];
+            config.files.splice(index, 1);
+            config.previewUrls.splice(index, 1);
+            renderUniversePreviews();
+        }
+
+        // ===== Save/Restore Form Data =====
+        function saveFormData(levelNum) {
+            const config = levelConfigs[levelNum];
+            if (!config) return;
+
+            switch (levelNum) {
+                case 1:
+                    const codeEl = document.getElementById('cfg-password-code');
+                    const hintEl = document.getElementById('cfg-password-hint');
+                    if (codeEl) config.code = codeEl.value;
+                    if (hintEl) config.hint = hintEl.value;
+                    break;
+
+                case 2:
+                    saveMemoryData();
+                    break;
+
+                case 3:
+                    const chargeEl = document.getElementById('cfg-charge-message');
+                    if (chargeEl) config.completeMessage = chargeEl.value;
+                    break;
+
+                case 4:
+                    const universeMsg = document.getElementById('cfg-universe-message');
+                    if (universeMsg) config.message = universeMsg.value;
+                    break;
+
+                case 5:
+                    const letterMsg = document.getElementById('cfg-letter-message');
+                    if (letterMsg) config.message = letterMsg.value;
+                    break;
+
+                case 6:
+                    const qText = document.getElementById('cfg-question-text');
+                    const qYes = document.getElementById('cfg-question-yes');
+                    const qSuccess = document.getElementById('cfg-question-success');
+                    if (qText) config.question = qText.value;
+                    if (qYes) config.yesText = qYes.value;
+                    if (qSuccess) config.successMessage = qSuccess.value;
+                    break;
+            }
+        }
+
+        function restoreFormData(levelNum) {
+            const config = levelConfigs[levelNum];
+            if (!config) return;
+
+            switch (levelNum) {
+                case 1:
+                    const codeEl = document.getElementById('cfg-password-code');
+                    const hintEl = document.getElementById('cfg-password-hint');
+                    if (codeEl) codeEl.value = config.code || '';
+                    if (hintEl) hintEl.value = config.hint || '';
+                    break;
+
+                case 2:
+                    renderMemories();
+                    break;
+
+                case 3:
+                    const chargeEl = document.getElementById('cfg-charge-message');
+                    if (chargeEl) chargeEl.value = config.completeMessage || '';
+                    break;
+
+                case 4:
+                    const universeMsg = document.getElementById('cfg-universe-message');
+                    if (universeMsg) universeMsg.value = config.message || '';
+                    renderUniversePreviews();
+                    break;
+
+                case 5:
+                    const letterMsg = document.getElementById('cfg-letter-message');
+                    if (letterMsg) letterMsg.value = config.message || '';
+                    break;
+
+                case 6:
+                    const qText = document.getElementById('cfg-question-text');
+                    const qYes = document.getElementById('cfg-question-yes');
+                    const qSuccess = document.getElementById('cfg-question-success');
+                    if (qText) qText.value = config.question || '';
+                    if (qYes) qYes.value = config.yesText || '';
+                    if (qSuccess) qSuccess.value = config.successMessage || '';
+                    break;
+            }
+        }
+
+        // =============================================
+        //  STEP 3: Preview & Publish
+        // =============================================
+        function goToStep3() {
+            // Save current tab data
+            const currentTab = document.querySelector('.level-tab.active');
+            if (currentTab) {
+                saveFormData(parseInt(currentTab.dataset.level));
+            }
+
+            // Save all tabs data
+            selectedLevels.forEach(lvl => {
+                const configEl = document.getElementById(`config-${lvl}`);
+                if (configEl) saveFormData(lvl);
+            });
+
+            // Build summary
+            buildPublishSummary();
+            goToStep(3);
+        }
+
+        function buildPublishSummary() {
+            const summaryEl = document.getElementById('publish-summary');
+            const projectName = document.getElementById('input-project-name').value.trim();
+
+            let html = `
+                <div class="summary-item">
+                    <span class="summary-emoji">🎁</span>
+                    <div class="summary-text">
+                        <h4>${escapeHtml(projectName)}</h4>
+                        <p>${selectedLevels.length} ด่าน</p>
+                    </div>
+                    <span class="summary-check">✓</span>
+                </div>`;
+
+            selectedLevels.forEach(lvl => {
+                const def = LEVEL_DEFS[lvl];
+                const config = levelConfigs[lvl];
+                let status = '';
+                let isComplete = false;
+
+                switch (lvl) {
+                    case 1:
+                        isComplete = config.code && config.code.length === 6;
+                        status = isComplete ? `รหัส: ${config.code}` : 'ยังไม่ได้ตั้งรหัส';
+                        break;
+                    case 2:
+                        const memCount = config.memories.filter(m => m.title || m.date).length;
+                        isComplete = memCount > 0;
+                        status = `${memCount} ความทรงจำ`;
+                        break;
+                    case 3:
+                        isComplete = true;
+                        status = config.completeMessage || 'ใช้ค่าเริ่มต้น';
+                        break;
+                    case 4:
+                        isComplete = config.files.length > 0 || config.previewUrls.length > 0;
+                        status = `${config.files.length} รูป`;
+                        break;
+                    case 5:
+                        isComplete = config.message && config.message.trim().length > 0;
+                        status = isComplete ? 'มีข้อความแล้ว' : 'ยังไม่ได้เขียนข้อความ';
+                        break;
+                    case 6:
+                        isComplete = true;
+                        status = config.question || 'ใช้ค่าเริ่มต้น';
+                        break;
+                }
+
+                html += `
+                    <div class="summary-item">
+                        <span class="summary-emoji">${def.emoji}</span>
+                        <div class="summary-text">
+                            <h4>ด่าน ${lvl}: ${def.name}</h4>
+                            <p>${escapeHtml(status)}</p>
+                        </div>
+                        ${isComplete ? '<span class="summary-check">✓</span>' : '<span class="summary-warning">⚠️</span>'}
+                    </div>`;
+            });
+
+            summaryEl.innerHTML = html;
+        }
+
+        // =============================================
+        //  PUBLISH
+        // =============================================
+        async function publishProject() {
+            const projectName = document.getElementById('input-project-name').value.trim();
+
+            showLoading('กำลังเตรียมข้อมูล...');
+
+            try {
+                let totalFiles = 0;
+                let uploadedFiles = 0;
+
+                // Count total files
+                selectedLevels.forEach(lvl => {
+                    const config = levelConfigs[lvl];
+                    if (lvl === 2) {
+                        totalFiles += config.memories.filter(m => m.file).length;
+                    } else if (lvl === 4) {
+                        totalFiles += config.files.length;
+                    }
+                });
+
+                // Build level data
+                const levelData = {};
+
+                for (const lvl of selectedLevels) {
+                    const config = levelConfigs[lvl];
+
+                    switch (lvl) {
+                        case 1:
+                            levelData.password = {
+                                code: config.code || '000000',
+                                hint: config.hint || ''
+                            };
+                            break;
+
+                        case 2:
+                            const memories = [];
+                            for (let i = 0; i < config.memories.length; i++) {
+                                const mem = config.memories[i];
+                                let imageUrl = '';
+
+                                if (mem.file) {
+                                    updateLoading(`อัพโหลดรูป Memory ${i + 1}...`, (uploadedFiles / Math.max(totalFiles, 1)) * 100);
+                                    const path = `projects/${projectId}/timeline/memory_${i}_${Date.now()}`;
+                                    const ref = storage.ref().child(path);
+                                    await ref.put(mem.file);
+                                    imageUrl = await ref.getDownloadURL();
+                                    uploadedFiles++;
+                                }
+
+                                memories.push({
+                                    date: mem.date || '',
+                                    title: mem.title || '',
+                                    desc: mem.desc || '',
+                                    imageUrl: imageUrl
+                                });
+                            }
+                            levelData.timeline = { memories };
+                            break;
+
+                        case 3:
+                            levelData.charging = {
+                                completeMessage: config.completeMessage || 'หัวใจเต็มเปี่ยม! 💖💖💖'
+                            };
+                            break;
+
+                        case 4:
+                            const universeImages = [];
+                            for (let i = 0; i < config.files.length; i++) {
+                                updateLoading(`อัพโหลดรูป Universe ${i + 1}...`, (uploadedFiles / Math.max(totalFiles, 1)) * 100);
+                                const path = `projects/${projectId}/universe/img_${i}_${Date.now()}`;
+                                const ref = storage.ref().child(path);
+                                await ref.put(config.files[i]);
+                                const url = await ref.getDownloadURL();
+                                universeImages.push(url);
+                                uploadedFiles++;
+                            }
+                            levelData.universe = {
+                                images: universeImages,
+                                message: config.message || ''
+                            };
+                            break;
+
+                        case 5:
+                            levelData.letter = {
+                                message: config.message || ''
+                            };
+                            break;
+
+                        case 6:
+                            levelData.question = {
+                                question: config.question || 'รักเค้าไหมคะ?',
+                                yesText: config.yesText || 'รักสิ! 💖',
+                                successMessage: config.successMessage || 'เย้! รักเหมือนกันนน 💖'
+                            };
+                            break;
+                    }
+                }
+
+                // Save to Firestore
+                updateLoading('กำลังบันทึกโปรเจค...', 95);
+
+                await db.collection('projects').doc(projectId).set({
+                    name: projectName,
+                    levels: selectedLevels,
+                    levelData: levelData,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'published'
+                });
+
+                // Save to localStorage
+                const savedIds = JSON.parse(localStorage.getItem('surprise_projects') || '[]');
+                if (!savedIds.includes(projectId)) {
+                    savedIds.push(projectId);
+                    localStorage.setItem('surprise_projects', JSON.stringify(savedIds));
+                }
+
+                hideLoading();
+
+                // Show share link
+                const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
+                const shareUrl = baseUrl + '?id=' + projectId;
+                document.getElementById('share-link-url').value = shareUrl;
+                document.getElementById('share-box').classList.add('visible');
+                document.getElementById('publish-actions').style.display = 'none';
+
+                showToast('🎉 เผยแพร่สำเร็จ!');
+
+            } catch (error) {
+                hideLoading();
+                console.error('Publish error:', error);
+                showToast('เกิดข้อผิดพลาด: ' + error.message, true);
+            }
+        }
+
+        function copyShareLink() {
+            const url = document.getElementById('share-link-url').value;
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('คัดลอกลิงค์แล้ว! 📋');
+            });
+        }
+
+        // =============================================
+        //  NAVIGATION
+        // =============================================
+        function goToStep(step) {
+            currentStep = step;
+            updateProgressUI();
+            showStepContent(step);
+        }
+
+        function updateProgressUI() {
+            for (let i = 1; i <= 3; i++) {
+                const stepEl = document.getElementById(`prog-step-${i}`);
+                const lineEl = document.getElementById(`prog-line-${i}`);
+
+                stepEl.classList.remove('active', 'completed');
+                if (lineEl) lineEl.classList.remove('active');
+
+                if (i < currentStep) {
+                    stepEl.classList.add('completed');
+                    if (lineEl) lineEl.classList.add('active');
+                } else if (i === currentStep) {
+                    stepEl.classList.add('active');
+                }
+            }
+        }
+
+        function showStepContent(step) {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+            const stepEl = document.getElementById(`step-${step}`);
+            if (stepEl) {
+                stepEl.classList.add('active');
+                // Re-trigger animation
+                stepEl.style.animation = 'none';
+                stepEl.offsetHeight; // trigger reflow
+                stepEl.style.animation = null;
+            }
+        }
+
+        // =============================================
+        //  UTILITIES
+        // =============================================
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            setTimeout(() => toast.classList.add('visible'), 10);
+            setTimeout(() => toast.classList.remove('visible'), 3000);
+        }
+
+        function showLoading(text, progress = 0) {
+            document.getElementById('loading-text').textContent = text;
+            document.getElementById('loading-progress-bar').style.width = progress + '%';
+            document.getElementById('loading-overlay').classList.add('visible');
+        }
+
+        function updateLoading(text, progress) {
+            document.getElementById('loading-text').textContent = text;
+            document.getElementById('loading-progress-bar').style.width = progress + '%';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').classList.remove('visible');
+        }
+
+        // =============================================
+        //  INIT
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            showDashboard();
+        });
+    </script>
+</body>
+
+</html>

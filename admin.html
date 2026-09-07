@@ -1661,21 +1661,26 @@
             };
         }
 
-        function publishProject() {
-            showLoading('กำลังบีบอัดข้อมูล...');
+        async function publishProject() {
+            showLoading('กำลังบันทึกข้อมูล...');
 
-            // Use setTimeout to allow UI to update
-            setTimeout(() => {
-                try {
-                    const data = buildProjectData();
-                    const jsonStr = JSON.stringify(data);
+            try {
+                const data = buildProjectData();
 
-                    // Compress with LZ-String
-                    const compressed = LZString.compressToEncodedURIComponent(jsonStr);
+                // Call PHP API
+                const apiURL = 'http://14.207.178.163/baby/api/save_project.php'; // URL ปลายทางที่คุณจะเอา API ไปวาง
+                const response = await fetch(apiURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
 
-                    // Build share URL
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // Build share URL (Netlify URL + query param id)
                     const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
-                    const shareUrl = baseUrl + '#' + compressed;
+                    const shareUrl = baseUrl + '?id=' + result.project_id;
 
                     // Save reference in localStorage
                     const projects = JSON.parse(localStorage.getItem('surprise_projects') || '[]');
@@ -1694,13 +1699,15 @@
 
                     hideLoading();
                     showToast('🎉 สร้างลิงค์สำเร็จ!');
-
-                } catch (error) {
-                    hideLoading();
-                    showToast('เกิดข้อผิดพลาด: ' + error.message, true);
-                    console.error(error);
+                } else {
+                    throw new Error(result.message || 'Unknown error');
                 }
-            }, 100);
+
+            } catch (error) {
+                hideLoading();
+                showToast('เกิดข้อผิดพลาด: ' + error.message, true);
+                console.error(error);
+            }
         }
 
         function copyShareLink() {

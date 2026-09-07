@@ -395,24 +395,27 @@
         // =============================================
         //  INITIALIZATION
         // =============================================
-        function init() {
-            const hash = window.location.hash.substring(1); // remove '#'
+        async function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('id');
 
-            if (!hash) {
+            if (!projectId) {
                 hideLoader();
                 document.getElementById('landing-page').style.display = 'flex';
                 return;
             }
 
             try {
-                // Decompress from URL hash
-                const jsonStr = LZString.decompressFromEncodedURIComponent(hash);
-
-                if (!jsonStr) {
-                    throw new Error('Decompress failed');
+                // Fetch from PHP API
+                const apiURL = `http://14.207.178.163/baby/api/get_project.php?id=${projectId}`; // URL ปลายทางของ API
+                const response = await fetch(apiURL);
+                
+                if (!response.ok) {
+                    throw new Error('Project not found');
                 }
 
-                projectData = JSON.parse(jsonStr);
+                projectData = await response.json();
+                
                 document.title = (projectData.name || 'Surprise') + ' 💖';
 
                 buildLevelMenu();
